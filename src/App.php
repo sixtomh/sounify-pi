@@ -8,11 +8,19 @@ use Sounify\Scraper\SpotifyScraper;
 use Sounify\Downloader\AudioDownloader;
 use Sounify\Playlist\M3uWriter;
 use Sounify\Integrations\NavidromeClient;
+use Sounify\Metadata\MetadataEnricher;
 
 class App
 {
+    private static bool $autoloaderRegistered = false;
+
     public static function registerAutoloader(): void
     {
+        if (self::$autoloaderRegistered) {
+            return;
+        }
+        self::$autoloaderRegistered = true;
+
         spl_autoload_register(function ($class) {
             $prefix = 'Sounify\\';
             $baseDir = __DIR__ . '/';
@@ -31,16 +39,34 @@ class App
         });
     }
 
+    private function setHeader(string $header, bool $replace = true, int $responseCode = 0): void
+    {
+        if (!headers_sent()) {
+            if ($responseCode > 0) {
+                header($header, $replace, $responseCode);
+            } else {
+                header($header, $replace);
+            }
+        }
+    }
+
+    private function setResponseCode(int $code): void
+    {
+        if (!headers_sent()) {
+            http_response_code($code);
+        }
+    }
+
     public function run(): void
     {
-        if (session_status() === PHP_SESSION_NONE) {
+        if (session_status() === PHP_SESSION_NONE && !headers_sent()) {
             @session_start([
                 'cookie_httponly' => true,
                 'cookie_samesite' => 'Lax',
             ]);
         }
 
-        $uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
+        $uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
         $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
         // Redirecciones y rutas directas de login y logout
@@ -56,11 +82,11 @@ class App
 
         // Rutas API
         if (str_starts_with($uri, '/api/')) {
-            header('Content-Type: application/json; charset=utf-8');
+            $this->setHeader('Content-Type: application/json; charset=utf-8');
             try {
                 $this->handleApi($uri, $method);
             } catch (\Throwable $e) {
-                http_response_code(500);
+                $this->setResponseCode(500);
                 echo json_encode([
                     'error' => true,
                     'message' => $e->getMessage()
@@ -104,8 +130,8 @@ class App
             $ext = strtolower(pathinfo($realFile, PATHINFO_EXTENSION));
             // Permitir servir archivos estáticos públicos excepto la petición a la app raíz
             if (!is_dir($realFile) && $uri !== '/' && $uri !== '/index.php' && isset($mimes[$ext])) {
-                header('Content-Type: ' . $mimes[$ext]);
-                header('Cache-Control: public, max-age=3600');
+                $this->setHeader('Content-Type: ' . $mimes[$ext]);
+                $this->setHeader('Cache-Control: public, max-age=3600');
                 readfile($realFile);
                 return;
             }
@@ -114,21 +140,21 @@ class App
         // Si se solicitó un archivo estático conocido que no existe, retornar 404 (nunca redirigir a login.php)
         $reqExt = strtolower(pathinfo($uri, PATHINFO_EXTENSION));
         if ($reqExt !== '' && isset($mimes[$reqExt]) && $reqExt !== 'html' && $reqExt !== 'htm') {
-            http_response_code(404);
-            header('Content-Type: text/plain; charset=utf-8');
+            $this->setResponseCode(404);
+            $this->setHeader('Content-Type: text/plain; charset=utf-8');
             echo "Not Found: " . htmlspecialchars($uri);
             return;
         }
 
         // Si la autenticación está habilitada y no está autenticado, redirigir a login.php
         if (!$this->isAuthenticated()) {
-            header('Location: /login.php');
+            $this->setHeader('Location: /login.php');
             exit;
         }
 
         // Servir la vista principal de la aplicación
         $appView = dirname(__DIR__) . '/src/Views/index.html';
-        header('Content-Type: text/html; charset=utf-8');
+        $this->setHeader('Content-Type: text/html; charset=utf-8');
         if (file_exists($appView)) {
             readfile($appView);
         } else {
@@ -143,7 +169,11 @@ class App
 
     private function handleApi(string $uri, string $method): void
     {
-        $input = json_decode(file_get_contents('php://input'), true) ?? [];
+        $rawInput = file_get_contents('php://input');
+        $input = !empty($rawInput) ? json_decode($rawInput, true) : null;
+        if (!is_array($input)) {
+            $input = $_POST ?: [];
+        }
 
         // Rutas públicas de autenticación
         if ($uri === '/api/auth/status') {
@@ -170,7 +200,7 @@ class App
                 $_SESSION['sounify_user'] = $user;
                 echo json_encode(['success' => true, 'message' => 'Login successful']);
             } else {
-                http_response_code(401);
+                $this->setResponseCode(401);
                 echo json_encode(['error' => true, 'message' => 'Usuario o contraseña incorrectos']);
             }
             return;
@@ -178,9 +208,8 @@ class App
 
         if ($uri === '/api/auth/logout' && $method === 'POST') {
             $_SESSION = [];
-            unset($_SESSION['sounify_authenticated']);
-            unset($_SESSION['sounify_user']);
-            if (ini_get("session.use_cookies")) {
+            unset($_SESSION['sounify_authenticated'], $_SESSION['sounify_user']);
+            if (!headers_sent() && ini_get("session.use_cookies")) {
                 $params = session_get_cookie_params();
                 setcookie(session_name(), '', [
                     'expires' => time() - 42000,
@@ -199,7 +228,7 @@ class App
 
         // Si la autenticación está activa y no está autenticado, denegar acceso a la API
         if (!$this->isAuthenticated()) {
-            http_response_code(401);
+            $this->setResponseCode(401);
             echo json_encode([
                 'error' => true,
                 'unauthorized' => true,
@@ -216,7 +245,7 @@ class App
 
             $validHash = Config::get('auth_password_hash', '');
             if (!password_verify($currentPass, $validHash)) {
-                http_response_code(400);
+                $this->setResponseCode(400);
                 echo json_encode(['error' => true, 'message' => 'La contraseña actual no es correcta']);
                 return;
             }
@@ -228,7 +257,7 @@ class App
 
             if ($newPassword !== '') {
                 if (strlen($newPassword) < 4) {
-                    http_response_code(400);
+                    $this->setResponseCode(400);
                     echo json_encode(['error' => true, 'message' => 'La nueva contraseña debe tener al menos 4 caracteres']);
                     return;
                 }
@@ -272,13 +301,13 @@ class App
             case '/api/resolve':
                 $url = trim($input['url'] ?? ($_GET['url'] ?? ''));
                 if (!$url) {
-                    http_response_code(400);
+                    $this->setResponseCode(400);
                     echo json_encode(['error' => 'URL is required']);
                     return;
                 }
                 $scraper = new SpotifyScraper();
                 $data = $scraper->resolve($url);
-                $enricher = new \Sounify\Metadata\MetadataEnricher();
+                $enricher = new MetadataEnricher();
                 if ($data['type'] === 'track') {
                     $data = $enricher->enrich($data);
                 } elseif (!empty($data['tracks'])) {
@@ -302,7 +331,7 @@ class App
             case '/api/download':
                 $track = $input['track'] ?? null;
                 if (!$track) {
-                    http_response_code(400);
+                    $this->setResponseCode(400);
                     echo json_encode(['error' => 'Track data is required']);
                     return;
                 }
@@ -335,7 +364,7 @@ class App
                 } catch (\Throwable $e) {
                     $stmtErr = $pdo->prepare("UPDATE jobs SET status = 'error', message = :m WHERE id = :id");
                     $stmtErr->execute([':m' => $e->getMessage(), ':id' => $jobId]);
-                    http_response_code(500);
+                    $this->setResponseCode(500);
                     echo json_encode(['error' => true, 'message' => $e->getMessage()]);
                 }
                 return;
@@ -359,12 +388,12 @@ class App
                 $stmt->execute([':id' => $id]);
                 $track = $stmt->fetch();
                 if (!$track || empty($track['file_path']) || !file_exists($track['file_path'])) {
-                    http_response_code(404);
+                    $this->setResponseCode(404);
                     echo json_encode(['error' => 'Audio file not found on disk']);
                     return;
                 }
 
-                $filePath = $track['file_path'];
+                $filePath = (string) $track['file_path'];
                 $fileSize = (int) filesize($filePath);
                 $ext = strtolower($track['format'] ?? pathinfo($filePath, PATHINFO_EXTENSION));
                 $mimeType = match ($ext) {
@@ -376,7 +405,7 @@ class App
                 };
 
                 if (ob_get_level()) {
-                    ob_end_clean();
+                    @ob_end_clean();
                 }
 
                 $range = $_SERVER['HTTP_RANGE'] ?? null;
@@ -384,35 +413,41 @@ class App
                     $start = (int) $matches[1];
                     $end = ($matches[2] !== '') ? (int) $matches[2] : ($fileSize - 1);
                     if ($start > $end || $start >= $fileSize) {
-                        http_response_code(416);
-                        header("Content-Range: bytes */{$fileSize}");
+                        $this->setResponseCode(416);
+                        $this->setHeader("Content-Range: bytes */{$fileSize}");
                         return;
                     }
                     $length = $end - $start + 1;
-                    http_response_code(206);
-                    header("Content-Type: {$mimeType}");
-                    header("Content-Range: bytes {$start}-{$end}/{$fileSize}");
-                    header("Content-Length: {$length}");
-                    header("Accept-Ranges: bytes");
-                    header("Cache-Control: no-cache");
+                    $this->setResponseCode(206);
+                    $this->setHeader("Content-Type: {$mimeType}");
+                    $this->setHeader("Content-Range: bytes {$start}-{$end}/{$fileSize}");
+                    $this->setHeader("Content-Length: {$length}");
+                    $this->setHeader("Accept-Ranges: bytes");
+                    $this->setHeader("Cache-Control: no-cache");
 
                     $fp = fopen($filePath, 'rb');
-                    fseek($fp, $start);
-                    $bytesSent = 0;
-                    while (!feof($fp) && $bytesSent < $length && connection_status() === 0) {
-                        $chunk = min(16384, $length - $bytesSent);
-                        echo fread($fp, $chunk);
-                        flush();
-                        $bytesSent += $chunk;
+                    if ($fp !== false) {
+                        fseek($fp, $start);
+                        $bytesSent = 0;
+                        while (!feof($fp) && $bytesSent < $length && connection_status() === 0) {
+                            $chunkSize = min(16384, $length - $bytesSent);
+                            $buffer = fread($fp, $chunkSize);
+                            if ($buffer === false || $buffer === '') {
+                                break;
+                            }
+                            echo $buffer;
+                            flush();
+                            $bytesSent += strlen($buffer);
+                        }
+                        fclose($fp);
                     }
-                    fclose($fp);
                     return;
                 }
 
-                header("Content-Type: {$mimeType}");
-                header("Content-Length: " . $fileSize);
-                header("Accept-Ranges: bytes");
-                header("Cache-Control: no-cache");
+                $this->setHeader("Content-Type: {$mimeType}");
+                $this->setHeader("Content-Length: " . $fileSize);
+                $this->setHeader("Accept-Ranges: bytes");
+                $this->setHeader("Cache-Control: no-cache");
                 readfile($filePath);
                 return;
 
@@ -420,7 +455,7 @@ class App
                 $name = trim($input['name'] ?? 'Playlist');
                 $files = $input['files'] ?? [];
                 if (empty($files)) {
-                    http_response_code(400);
+                    $this->setResponseCode(400);
                     echo json_encode(['error' => 'No files provided for playlist']);
                     return;
                 }
@@ -472,7 +507,7 @@ class App
 
             case '/api/database/clean':
                 if ($method !== 'POST') {
-                    http_response_code(405);
+                    $this->setResponseCode(405);
                     echo json_encode(['error' => 'Method not allowed']);
                     return;
                 }
@@ -484,36 +519,54 @@ class App
                 if (!$keepFiles) {
                     $downloadDir = Config::getDownloadDir();
                     if (is_dir($downloadDir)) {
-                        $iterator = new \RecursiveIteratorIterator(
-                            new \RecursiveDirectoryIterator($downloadDir, \RecursiveDirectoryIterator::SKIP_DOTS),
-                            \RecursiveIteratorIterator::CHILD_FIRST
-                        );
-                        foreach ($iterator as $item) {
-                            $real = $item->getRealPath() ?: $item->getPathname();
-                            if ($item->isDir()) {
-                                @rmdir($real);
-                            } elseif ($item->isFile()) {
-                                if (file_exists($real) && @unlink($real)) {
+                        try {
+                            $iterator = new \RecursiveIteratorIterator(
+                                new \RecursiveDirectoryIterator($downloadDir, \RecursiveDirectoryIterator::SKIP_DOTS),
+                                \RecursiveIteratorIterator::CHILD_FIRST
+                            );
+                            foreach ($iterator as $item) {
+                                $real = $item->getRealPath() ?: $item->getPathname();
+                                if ($item->isDir()) {
+                                    @rmdir($real);
+                                } elseif ($item->isFile()) {
+                                    if (file_exists($real) && @unlink($real)) {
+                                        $deletedFilesCount++;
+                                    }
+                                }
+                            }
+                        } catch (\Throwable) {}
+                    }
+
+                    try {
+                        $files = $pdo->query("SELECT file_path FROM history")->fetchAll(PDO::FETCH_COLUMN);
+                        foreach ($files as $filePath) {
+                            if ($filePath && file_exists($filePath) && is_file($filePath)) {
+                                if (@unlink($filePath)) {
                                     $deletedFilesCount++;
                                 }
                             }
                         }
-                    }
-
-                    $files = $pdo->query("SELECT file_path FROM history")->fetchAll(PDO::FETCH_COLUMN);
-                    foreach ($files as $filePath) {
-                        if ($filePath && file_exists($filePath) && is_file($filePath)) {
-                            if (@unlink($filePath)) {
-                                $deletedFilesCount++;
-                            }
-                        }
-                    }
+                    } catch (\Throwable) {}
                 }
 
-                $countJobs = $pdo->exec("DELETE FROM jobs");
-                $countHistory = $pdo->exec("DELETE FROM history");
-                $pdo->exec("DELETE FROM sqlite_sequence WHERE name IN ('history', 'jobs')");
-                $pdo->exec("VACUUM");
+                $pdo->beginTransaction();
+                try {
+                    $countJobs = $pdo->exec("DELETE FROM jobs");
+                    $countHistory = $pdo->exec("DELETE FROM history");
+                    try {
+                        $pdo->exec("DELETE FROM sqlite_sequence WHERE name IN ('history', 'jobs')");
+                    } catch (\Throwable) {}
+                    $pdo->commit();
+                } catch (\Throwable $e) {
+                    if ($pdo->inTransaction()) {
+                        $pdo->rollBack();
+                    }
+                    throw $e;
+                }
+
+                try {
+                    $pdo->exec("VACUUM");
+                } catch (\Throwable) {}
 
                 echo json_encode([
                     'success' => true,
@@ -528,7 +581,7 @@ class App
                 return;
 
             default:
-                http_response_code(404);
+                $this->setResponseCode(404);
                 echo json_encode(['error' => 'Endpoint not found']);
                 return;
         }

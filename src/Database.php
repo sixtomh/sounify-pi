@@ -31,6 +31,12 @@ class Database
             self::$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             self::$pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 
+            // SQLite optimizations for Orange Pi flash storage / SD card endurance and concurrency
+            try {
+                self::$pdo->exec("PRAGMA journal_mode = WAL;");
+                self::$pdo->exec("PRAGMA synchronous = NORMAL;");
+            } catch (\Throwable) {}
+
             self::initSchema(self::$pdo);
         }
 
@@ -79,6 +85,15 @@ class Database
 
         try { $pdo->exec("ALTER TABLE history ADD COLUMN year TEXT"); } catch (\Throwable) {}
         try { $pdo->exec("ALTER TABLE history ADD COLUMN genre TEXT"); } catch (\Throwable) {}
+
+        // Índices para optimizar consultas de estado y listado
+        try {
+            $pdo->exec("
+                CREATE INDEX IF NOT EXISTS idx_jobs_status ON jobs(status);
+                CREATE INDEX IF NOT EXISTS idx_jobs_created_at ON jobs(created_at);
+                CREATE INDEX IF NOT EXISTS idx_history_downloaded_at ON history(downloaded_at);
+            ");
+        } catch (\Throwable) {}
 
         // Valores iniciales por defecto si no existen
         $defaults = [

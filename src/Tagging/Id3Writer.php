@@ -105,19 +105,18 @@ class Id3Writer
 
         $cmd[] = $tempFile;
 
+        $nullDevice = PHP_OS_FAMILY === 'Windows' ? 'NUL' : '/dev/null';
         $descriptors = [
             0 => ['pipe', 'r'],
-            1 => ['pipe', 'w'],
-            2 => ['pipe', 'w']
+            1 => ['file', $nullDevice, 'w'],
+            2 => ['file', $nullDevice, 'w']
         ];
 
         $process = @proc_open($cmd, $descriptors, $pipes);
         if (is_resource($process)) {
-            fclose($pipes[0]);
-            stream_get_contents($pipes[1]);
-            stream_get_contents($pipes[2]);
-            fclose($pipes[1]);
-            fclose($pipes[2]);
+            if (isset($pipes[0]) && is_resource($pipes[0])) {
+                fclose($pipes[0]);
+            }
             $returnCode = proc_close($process);
         } else {
             $returnCode = 1;

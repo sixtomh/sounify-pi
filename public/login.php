@@ -6,8 +6,8 @@ Sounify\App::registerAutoloader();
 
 use Sounify\Config;
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start([
+if (session_status() === PHP_SESSION_NONE && !headers_sent()) {
+    @session_start([
         'cookie_httponly' => true,
         'cookie_samesite' => 'Lax',
     ]);
@@ -15,8 +15,10 @@ if (session_status() === PHP_SESSION_NONE) {
 
 // Si ya está iniciada la sesión, redirigir a la app
 if (!empty($_SESSION['sounify_authenticated']) && $_SESSION['sounify_authenticated'] === true) {
-    header('Location: /');
-    exit;
+    if (!headers_sent()) {
+        header('Location: /');
+        exit;
+    }
 }
 
 $error = '';
@@ -31,8 +33,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($username === $validUser && ($validHash !== '' && password_verify($password, $validHash))) {
         $_SESSION['sounify_authenticated'] = true;
         $_SESSION['sounify_user'] = $username;
-        header('Location: /');
-        exit;
+        if (!headers_sent()) {
+            header('Location: /');
+            exit;
+        }
     } else {
         $error = 'Incorrect username or password. Please try again.';
     }

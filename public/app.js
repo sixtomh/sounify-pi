@@ -35,6 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const playerCurrTime = document.getElementById('player-curr-time');
   const playerProgressFill = document.getElementById('player-progress-fill');
   const btnPlayerStop = document.getElementById('btn-player-stop');
+  const queueBadge = document.getElementById('queue-badge');
 
   let currentPlayingId = null;
 
@@ -46,6 +47,8 @@ document.addEventListener('DOMContentLoaded', () => {
       try {
         audioPreview.pause();
         audioPreview.currentTime = 0;
+        audioPreview.removeAttribute('src');
+        audioPreview.load();
       } catch (e) {}
     }
     if (playerBar) playerBar.style.display = 'none';
@@ -292,6 +295,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const playlistContext = {
           name: data.name || data.title || 'Playlist',
           totalTracks: data.tracks.length,
+          processedCount: 0,
           downloadedPaths: []
         };
         data.tracks.forEach(track => queueDownload(track, playlistContext));
@@ -337,14 +341,22 @@ document.addEventListener('DOMContentLoaded', () => {
           body: JSON.stringify({ track: item.track })
         });
         const json = await res.json();
-        if (json.output_path && item.playlistContext) {
-          item.playlistContext.downloadedPaths.push(json.output_path);
-          if (item.playlistContext.downloadedPaths.length === item.playlistContext.totalTracks) {
+        if (item.playlistContext) {
+          item.playlistContext.processedCount = (item.playlistContext.processedCount || 0) + 1;
+          if (json.output_path) {
+            item.playlistContext.downloadedPaths.push(json.output_path);
+          }
+          if (item.playlistContext.processedCount === item.playlistContext.totalTracks && item.playlistContext.downloadedPaths.length > 0) {
             triggerM3uGeneration(item.playlistContext);
           }
         }
       } catch (e) {
-        console.error('Error downloading queued track:', e);
+        if (item.playlistContext) {
+          item.playlistContext.processedCount = (item.playlistContext.processedCount || 0) + 1;
+          if (item.playlistContext.processedCount === item.playlistContext.totalTracks && item.playlistContext.downloadedPaths.length > 0) {
+            triggerM3uGeneration(item.playlistContext);
+          }
+        }
       }
       loadJobs();
     }
@@ -363,22 +375,23 @@ document.addEventListener('DOMContentLoaded', () => {
           files: context.downloadedPaths
         })
       });
-    } catch (e) {
-      console.warn('Failed to generate M3U playlist:', e);
-    }
+    } catch (e) {}
   }
 
   function updateQueueBadge() {
     const totalPending = downloadQueue.length;
-    if (totalPending > 0) {
-      queueBadge.textContent = totalPending;
-      queueBadge.style.display = 'inline-block';
+    if (queueBadge) {
+      if (totalPending > 0) {
+        queueBadge.textContent = totalPending;
+        queueBadge.style.display = 'inline-block';
+      } else {
+        queueBadge.style.display = 'none';
+      }
     }
   }
 
   // Active Downloads & Jobs Polling
   const jobsList = document.getElementById('jobs-list');
-  const queueBadge = document.getElementById('queue-badge');
   const clearJobsBtn = document.getElementById('clear-jobs-btn');
 
   clearJobsBtn?.addEventListener('click', async () => {
@@ -386,18 +399,24 @@ document.addEventListener('DOMContentLoaded', () => {
     loadJobs();
   });
 
+  let isFetchingJobs = false;
+
   async function loadJobs() {
+    if (isFetchingJobs) return;
+    isFetchingJobs = true;
     try {
       const res = await fetch('/api/jobs');
       const data = await res.json();
       const jobs = data.jobs || [];
 
       const activeCount = jobs.filter(j => j.status === 'downloading' || j.status === 'pending').length;
-      if (activeCount > 0) {
-        queueBadge.textContent = activeCount;
-        queueBadge.style.display = 'inline-block';
-      } else {
-        queueBadge.style.display = 'none';
+      if (queueBadge) {
+        if (activeCount > 0) {
+          queueBadge.textContent = activeCount;
+          queueBadge.style.display = 'inline-block';
+        } else if (downloadQueue.length === 0) {
+          queueBadge.style.display = 'none';
+        }
       }
 
       if (jobs.length === 0) {
@@ -432,7 +451,9 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
       }).join('');
     } catch (e) {
-      console.error(e);
+      // Ignored: polling network failure
+    } finally {
+      isFetchingJobs = false;
     }
   }
 
@@ -915,7 +936,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const originalFetch = window.fetch;
   window.fetch = async (...args) => {
     const res = await originalFetch(...args);
-    if (res.status === 401 && !args[0].includes('/api/auth/status')) {
+    const reqUrl = typeof args[0] === 'string' ? args[0] : (args[0]?.url || '');
+    if (res.status === 401 && !reqUrl.includes('/api/auth/status')) {
       window.location.href = '/login.php';
     }
     return res;

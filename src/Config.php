@@ -38,6 +38,10 @@ class Config
         if (PHP_OS_FAMILY === 'Windows' && str_starts_with($val, '/')) {
             return $default;
         }
+        // Si apunta a un directorio scratch/temporal antiguo o inexistente que no se puede crear
+        if (str_contains($val, '.gemini') || str_contains($val, 'scratch') || (!is_dir($val) && !@mkdir($val, 0755, true))) {
+            return $default;
+        }
         return $val;
     }
 
@@ -63,12 +67,21 @@ class Config
     public static function setMultiple(array $settings): void
     {
         $pdo = Database::get();
-        $stmt = $pdo->prepare("INSERT INTO settings (key, value) VALUES (:key, :value) ON CONFLICT(key) DO UPDATE SET value = :value");
-        foreach ($settings as $k => $v) {
-            if ($k === 'auth_password_hash') {
-                continue;
+        $pdo->beginTransaction();
+        try {
+            $stmt = $pdo->prepare("INSERT INTO settings (key, value) VALUES (:key, :value) ON CONFLICT(key) DO UPDATE SET value = :value");
+            foreach ($settings as $k => $v) {
+                if ($k === 'auth_password_hash') {
+                    continue;
+                }
+                $stmt->execute([':key' => (string) $k, ':value' => (string) $v]);
             }
-            $stmt->execute([':key' => $k, ':value' => (string) $v]);
+            $pdo->commit();
+        } catch (\Throwable $e) {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+            throw $e;
         }
     }
 }

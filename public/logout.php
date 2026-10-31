@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-if (session_status() === PHP_SESSION_NONE) {
+if (session_status() === PHP_SESSION_NONE && !headers_sent()) {
     @session_start([
         'cookie_httponly' => true,
         'cookie_samesite' => 'Lax',
@@ -9,10 +9,9 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 $_SESSION = [];
-unset($_SESSION['sounify_authenticated']);
-unset($_SESSION['sounify_user']);
+unset($_SESSION['sounify_authenticated'], $_SESSION['sounify_user']);
 
-if (ini_get("session.use_cookies")) {
+if (!headers_sent() && ini_get("session.use_cookies")) {
     $params = session_get_cookie_params();
     setcookie(
         session_name(),
@@ -31,5 +30,7 @@ if (ini_get("session.use_cookies")) {
 @session_destroy();
 @session_write_close();
 
-header('Location: /login.php');
-exit;
+if (!headers_sent()) {
+    header('Location: /login.php');
+    exit;
+}

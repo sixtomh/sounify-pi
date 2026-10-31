@@ -99,8 +99,12 @@ class NavidromeClient
         $url = "{$this->baseUrl}/rest/{$endpoint}?" . http_build_query($params);
 
         $ch = curl_init($url);
+        if ($ch === false) {
+            throw new \RuntimeException("Could not initialize cURL connection for {$endpoint}");
+        }
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_CONNECTTIMEOUT => 5,
             CURLOPT_TIMEOUT => 10,
             CURLOPT_SSL_VERIFYPEER => false,
         ]);

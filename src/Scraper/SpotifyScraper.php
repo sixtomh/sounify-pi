@@ -202,12 +202,15 @@ class SpotifyScraper
         }
 
         usort($sources, function ($a, $b) {
-            $wA = (int) ($a['width'] ?? $a['maxWidth'] ?? 0);
-            $wB = (int) ($b['width'] ?? $b['maxWidth'] ?? 0);
+            $wA = is_array($a) ? (int) ($a['width'] ?? $a['maxWidth'] ?? 0) : 0;
+            $wB = is_array($b) ? (int) ($b['width'] ?? $b['maxWidth'] ?? 0) : 0;
             return $wB <=> $wA;
         });
 
-        return $sources[0]['url'] ?? '';
+        if (is_string($sources[0])) {
+            return $sources[0];
+        }
+        return is_array($sources[0]) ? ($sources[0]['url'] ?? '') : '';
     }
 
     private function extractReleaseDate(array $entity): string
