@@ -13,7 +13,7 @@ class AudioMatcher
 
     public function findBestMatch(array $song): ?string
     {
-        $artists = !empty($song['artists']) ? implode(' ', $song['artists']) : ($song['artist'] ?? '');
+        $artists = !empty($song['artists']) ? implode(' ', $song['artists']) : str_replace(';', ' ', (string)($song['artist'] ?? ''));
         $title = $song['title'] ?? $song['name'] ?? '';
         $targetDuration = (int) ($song['duration'] ?? 0);
 

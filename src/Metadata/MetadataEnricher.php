@@ -20,8 +20,9 @@ class MetadataEnricher
 
         $title = $song['title'] ?? $song['name'] ?? '';
         $artist = !empty($song['artists'][0]) ? $song['artists'][0] : ($song['artist'] ?? '');
-        // Limpiar colaboraciones para la búsqueda (ej: "Lyry, IvanConly..." -> "Lyry")
-        $primaryArtist = trim(explode(',', (string)$artist)[0]);
+        // Limpiar colaboraciones para la búsqueda (ej: "Lyry; IvanConly..." -> "Lyry")
+        $primaryArtist = trim(explode(';', (string)$artist)[0]);
+        $primaryArtist = trim(explode(',', $primaryArtist)[0]);
 
         if (!empty($title)) {
             $meta = $this->queryItunes($title, $primaryArtist);

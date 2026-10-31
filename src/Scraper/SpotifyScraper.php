@@ -77,6 +77,9 @@ class SpotifyScraper
                ?? null;
 
         if (!is_array($entity)) {
+            if (($pageProps['status'] ?? null) === 404) {
+                throw new \RuntimeException("El enlace o ID de Spotify ({$kind}/{$id}) no existe o no se encuentra público.");
+            }
             throw new \RuntimeException("No se encontró la entidad musical en los datos de Spotify.");
         }
 
@@ -103,7 +106,7 @@ class SpotifyScraper
                 'name' => $name,
                 'title' => $name,
                 'artists' => $artists,
-                'artist' => implode(', ', $artists),
+                'artist' => implode('; ', $artists),
                 'album' => $albumName,
                 'album_name' => $albumName,
                 'duration' => $durationSec,
@@ -149,7 +152,7 @@ class SpotifyScraper
                 'name' => $tTitle,
                 'title' => $tTitle,
                 'artists' => $tArtists,
-                'artist' => implode(', ', $tArtists),
+                'artist' => implode('; ', $tArtists),
                 'album' => $tAlbum,
                 'album_name' => $tAlbum,
                 'release_date' => $itemRelDate,

@@ -53,15 +53,17 @@ class AudioDownloader
             $rawAlbum = $rawTitle;
         }
 
+        $primaryArtist = !empty($song['artists'][0]) ? $song['artists'][0] : trim(explode(';', (string)($song['artist'] ?? ''))[0]);
+        $folderArtist = $this->sanitizeFilename($primaryArtist ?: ($song['artist'] ?? 'Unknown Artist'));
         $safeArtist = $this->sanitizeFilename($song['artist'] ?? 'Unknown Artist');
         $safeAlbum = $this->sanitizeFilename($rawAlbum);
         $safeTitle = $this->sanitizeFilename($rawTitle);
 
         $targetDir = rtrim($downloadDir, '/\\');
         if ($organizeByArtist && $organizeByAlbum && $safeAlbum !== '') {
-            $targetDir .= '/' . $safeArtist . '/' . $safeAlbum;
+            $targetDir .= '/' . $folderArtist . '/' . $safeAlbum;
         } elseif ($organizeByArtist) {
-            $targetDir .= '/' . $safeArtist;
+            $targetDir .= '/' . $folderArtist;
         } elseif ($organizeByAlbum && $safeAlbum !== '') {
             $targetDir .= '/' . $safeAlbum;
         }

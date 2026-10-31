@@ -37,9 +37,19 @@ class Id3Writer
             $cmd[] = 'copy';
         }
 
-        // Metadatos estándar
+        // Metadatos estándar (Separador ';' para multi-artistas en Navidrome)
         $title = $song['title'] ?? $song['name'] ?? '';
-        $artist = !empty($song['artists']) ? implode(', ', $song['artists']) : ($song['artist'] ?? '');
+
+        $artistsList = [];
+        if (!empty($song['artists']) && is_array($song['artists'])) {
+            $artistsList = array_values(array_filter(array_map('trim', $song['artists'])));
+        } elseif (!empty($song['artist'])) {
+            $artistsList = array_values(array_filter(array_map('trim', preg_split('/[;,]/', (string) $song['artist']))));
+        }
+
+        $artist = !empty($artistsList) ? implode('; ', $artistsList) : ($song['artist'] ?? '');
+        $albumArtist = !empty($artistsList[0]) ? $artistsList[0] : $artist;
+
         $album = trim($song['album'] ?? $song['album_name'] ?? '');
         if ($album === '' || strtolower($album) === 'single') {
             $album = $title;
@@ -54,6 +64,16 @@ class Id3Writer
         if ($artist !== '') {
             $cmd[] = '-metadata';
             $cmd[] = "artist={$artist}";
+            $cmd[] = '-metadata';
+            $cmd[] = "ARTIST={$artist}";
+        }
+        if ($albumArtist !== '') {
+            $cmd[] = '-metadata';
+            $cmd[] = "album_artist={$albumArtist}";
+            $cmd[] = '-metadata';
+            $cmd[] = "albumartist={$albumArtist}";
+            $cmd[] = '-metadata';
+            $cmd[] = "TPE2={$albumArtist}";
         }
         if ($album !== '') {
             $cmd[] = '-metadata';
