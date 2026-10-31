@@ -12,7 +12,7 @@ services:
       ND_LOGLEVEL: info
       ND_SESSIONTIMEOUT: 24h
     volumes:
-      - /mnt/musica:/music:ro       # Carpeta de música en tu Orange Pi
+      - /mnt/storage/music:/music:ro       # Carpeta de música en tu Orange Pi
       - ./data/navidrome:/data
     restart: unless-stopped
 
@@ -24,7 +24,7 @@ services:
       - "8080:8080"
     volumes:
       # Montar la misma carpeta de música con permisos de escritura
-      - /mnt/musica:/app/storage/downloads:rw
+      - /mnt/storage/music:/app/storage/downloads:rw
       - ./data/sounify:/app/storage
     environment:
       - TZ=America/Santo_Domingo

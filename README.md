@@ -1,6 +1,6 @@
 # 🎵 Sounify Pi — Orange Pi & Navidrome Edition
 
-Self-hosted music downloader built in **PHP 8.2+**, inspired by [Downtify](https://github.com/henriquesebastiao/downtify), optimized specifically for **Orange Pi** boards (ARM64 / `aarch64`) and natively integrated with your **Navidrome** server.
+Self-hosted music downloader built in **PHP 8.2+**, optimized specifically for **Orange Pi** boards (ARM64 / `aarch64`) and natively integrated with your **Navidrome** server.
 
 ---
 
@@ -23,7 +23,7 @@ Self-hosted music downloader built in **PHP 8.2+**, inspired by [Downtify](https
 To allow Navidrome to index your music instantaneously, both services share the same storage folder:
 
 ```text
-/mnt/musica/                         <-- Your music directory on Orange Pi
+/mnt/storage/music/                  <-- Your music directory on Orange Pi
 ├── Queen/
 │   └── A Night at the Opera/
 │       └── 01. Queen - Bohemian Rhapsody.mp3
@@ -46,15 +46,15 @@ Choose between **Docker Compose** or **Native Installation (bare-metal with syst
 
 1. **Clone the repository on your Orange Pi:**
    ```bash
-   git clone https://github.com/tu-usuario/sounify-pi.git /opt/sounify-pi
+   git clone https://github.com/sixtomh/sounify-pi.git /opt/sounify-pi
    cd /opt/sounify-pi
    ```
 
 2. **Configure `docker-compose.yml`:**
-   Verify the host music volume matches your storage path on the Orange Pi (e.g. `/mnt/musica`):
+   Verify the host music volume matches your storage path on the Orange Pi (e.g. `/mnt/storage/music`):
    ```yaml
    volumes:
-     - /mnt/musica:/app/storage/downloads:rw
+     - /mnt/storage/music:/app/storage/downloads:rw
      - ./data/sounify:/app/storage
    ```
 
@@ -87,7 +87,7 @@ sudo pip3 install --break-system-packages yt-dlp
 
 #### 3. Clone Sounify Pi to `/opt/sounify-pi`:
 ```bash
-sudo git clone https://github.com/tu-usuario/sounify-pi.git /opt/sounify-pi
+sudo git clone https://github.com/sixtomh/sounify-pi.git /opt/sounify-pi
 cd /opt/sounify-pi
 sudo mkdir -p storage/downloads
 sudo chmod -R 777 storage
@@ -112,7 +112,7 @@ Open in your browser: `http://IP_OF_YOUR_ORANGE_PI:8080`
 ## ⚙️ Configuration & Navidrome Integration
 
 1. In Sounify Pi, go to the **Settings** tab.
-2. **Music Directory:** Set your local music storage path (e.g., `/mnt/musica`).
+2. **Music Directory:** Set your local music storage path (e.g., `/mnt/storage/music`).
 3. **File Organization:** Check `Organize in folders by Artist`, and `Organize in subfolders by Album`.
 4. **Navidrome Connection:**
    * Check **Enable Navidrome Server Connection**.
