@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sounify Pi · Documentation &amp; Setup Guide</title>
+  <meta name="description" content="Official documentation and setup guide for Sounify Pi - Self-hosted music downloader and automated Navidrome synchronizer for Orange Pi without API keys.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('sounify-theme') || 
+        (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+</head>
+<body>
+
+  <!-- Top Sticky Navigation Bar -->
+  <header class="docs-header">
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+      <button class="btn-mobile-menu" id="btn-mobile-menu" aria-label="Toggle navigation menu">
+        <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" fill="none" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+
+      <!-- Sounify Pi Brand Logo -->
+      <a href="index.html" class="brand-wrap">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 18V5l12-2v13"></path>
+            <circle cx="6" cy="18" r="3"></circle>
+            <circle cx="18" cy="16" r="3"></circle>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">Sounify <span>Pi</span></span>
+          <span class="docs-badge">Docs</span>
+        </div>
+      </a>
+    </div>
+
+    <!-- Header Actions (Search, Theme, Launch App) -->
+    <div class="header-actions">
+      <div class="search-container">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="text" id="docs-search" class="search-input" placeholder="Search documentation...">
+      </div>
+
+      <!-- Theme Switcher (Light / Dark Mode) -->
+      <button id="theme-toggle" class="btn-theme-toggle" aria-label="Toggle Light / Dark mode" title="Switch Theme">
+        <svg id="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <svg id="icon-moon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </button>
+
+      <!-- Launch App Button -->
+      <a href="/" class="btn-launch-app">
+        <span>Launch App</span>
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>
+      </a>
+    </div>
+  </header>
+
+  <!-- Docs Layout: Sidebar + Main Content + Right TOC -->
+  <div class="docs-container">
+    
+    <!-- Left Navigation Sidebar -->
+    <aside class="docs-sidebar" id="docs-sidebar">
+      
+      <div class="sidebar-group">
+        <div class="sidebar-title">Getting Started</div>
+        <ul class="sidebar-list">
+          <li><a href="#overview" class="sidebar-link active">Overview &amp; Concept</a></li>
+          <li><a href="#pipeline" class="sidebar-link">4-Step Audio Pipeline</a></li>
+          <li><a href="#quickstart" class="sidebar-link">Quickstart (Docker)</a></li>
+          <li><a href="#orangepi" class="sidebar-link">Orange Pi Native Setup</a></li>
+          <li><a href="#systemd" class="sidebar-link">Systemd Service Daemon</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-group">
+        <div class="sidebar-title">Features &amp; Settings</div>
+        <ul class="sidebar-list">
+          <li><a href="#naming" class="sidebar-link">File Naming Schemes</a></li>
+          <li><a href="#metadata" class="sidebar-link">Year, Genre &amp; ID3v2.3</a></li>
+          <li><a href="#covers" class="sidebar-link">Single cover.jpg Standard</a></li>
+          <li><a href="#preview" class="sidebar-link">20-Second Audio Preview</a></li>
+          <li><a href="#quality" class="sidebar-link">Audio Formats &amp; Bitrates</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-group">
+        <div class="sidebar-title">Integrations &amp; API</div>
+        <ul class="sidebar-list">
+          <li><a href="#navidrome" class="sidebar-link">Navidrome Subsonic Sync</a></li>
+          <li><a href="#api" class="sidebar-link">REST API Endpoints</a></li>
+          <li><a href="#troubleshooting" class="sidebar-link">Troubleshooting &amp; Tips</a></li>
+        </ul>
+      </div>
+
+    </aside>
+
+    <!-- Main Content -->
+    <main class="docs-main">
+      <article>
+        
+        <!-- Hero Introduction -->
+        <div class="doc-hero">
+          <h1>Sounify <span>Pi</span> Documentation</h1>
+          <p class="doc-hero-lead">
+            The lightweight, self-hosted music downloader and automated library synchronizer engineered for Orange Pi (ARM64) and Navidrome servers.
+          </p>
+          <div class="badge-row">
+            <span class="meta-badge highlight">v1.2.0</span>
+            <span class="meta-badge">Orange Pi &amp; SBC Ready</span>
+            <span class="meta-badge">Zero API Keys</span>
+            <span class="meta-badge">Navidrome Subsonic Auto-Sync</span>
+            <span class="meta-badge">ID3v2.3 + Year &amp; Genre</span>
+          </div>
+        </div>
+
+        <!-- 1. OVERVIEW -->
+        <section id="overview">
+          <h2>Overview &amp; Concept</h2>
+          <p>
+            <strong>Sounify Pi</strong> bridges public Spotify metadata with your personal music streaming server (such as <strong>Navidrome</strong> or <strong>Airsonic</strong>) running on self-hosted hardware like an <strong>Orange Pi 3B / 5</strong> or Raspberry Pi.
+          </p>
+          <p>
+            Traditional music downloaders either require Spotify Premium tokens, Spotify Developer accounts (which are frequently rate-limited or revoked), or heavyweight browser automation daemons. Sounify Pi eliminates all of that by taking a clean, lightweight approach:
+          </p>
+
+          <div class="callout">
+            <div class="callout-title">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+              Zero API Keys &amp; Keyless Metadata Enrichment
+            </div>
+            <p>
+              It parses public Spotify embed pages (<code>open.spotify.com/embed</code>) to extract tracklists and artwork, enriches missing Release Year and Genre using the free iTunes Search API, pulls official high-fidelity audio matches from YouTube Music via <code>yt-dlp</code>, embeds ID3v2.3 tags, and immediately prompts Navidrome to scan the newly downloaded album.
+            </p>
+          </div>
+        </section>
+
+        <!-- 2. PIPELINE -->
+        <section id="pipeline">
+          <h2>4-Step Audio Pipeline</h2>
+          <p>Every download job moves through a clean, deterministic 4-phase sequence:</p>
+
+          <div class="pipeline-steps">
+            <div class="pipeline-card">
+              <span class="pipeline-badge">PHASE 01</span>
+              <h4>1. Scrape &amp; Enrich</h4>
+              <p>Fetches metadata from public Spotify embeds and queries keyless databases for the track's release year and genre.</p>
+            </div>
+
+            <div class="pipeline-card">
+              <span class="pipeline-badge">PHASE 02</span>
+              <h4>2. High-Fi Audio Grab</h4>
+              <p>Uses <code>yt-dlp</code> with <code>ytsearch:</code> to fetch the matching official audio track and transcode to MP3 320k or FLAC.</p>
+            </div>
+
+            <div class="pipeline-card">
+              <span class="pipeline-badge">PHASE 03</span>
+              <h4>3. ID3v2 &amp; Single Cover</h4>
+              <p>Embeds ID3v2.3 tags (Title, Artist, Album, Year, Genre, Track) and saves a single standard <code>cover.jpg</code> per album.</p>
+            </div>
+
+            <div class="pipeline-card">
+              <span class="pipeline-badge">PHASE 04</span>
+              <h4>4. Navidrome Trigger</h4>
+              <p>Notifies your local Navidrome server via Subsonic API <code>startScan.view</code> to make tracks playable on all your devices immediately.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 3. QUICKSTART DOCKER -->
+        <section id="quickstart">
+          <h2>Quick Start (Docker Compose)</h2>
+          <p>
+            The fastest and cleanest deployment method for Orange Pi or home servers is using Docker Compose:
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span>docker-compose.yml</span>
+              <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre><code>services:
+  sounify-pi:
+    image: php:8.2-apache
+    container_name: sounify-pi
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./:/var/www/html
+      - /music:/var/www/html/storage/downloads
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Santo_Domingo</code></pre>
+          </div>
+
+          <p>Launch the service in background mode:</p>
+          <div class="code-block">
+            <div class="code-header">
+              <span>terminal</span>
+              <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre><code>docker compose up -d</code></pre>
+          </div>
+        </section>
+
+        <!-- 4. ORANGE PI SETUP -->
+        <section id="orangepi">
+          <h2>Orange Pi Native Setup</h2>
+          <p>
+            For minimal resource consumption on low-power ARM64 single board computers running Armbian or Debian, install the native binaries directly:
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span>terminal</span>
+              <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre><code># 1. Update packages and install dependencies
+sudo apt update
+sudo apt install -y php-cli php-sqlite3 php-curl ffmpeg python3-pip
+
+# 2. Install the latest yt-dlp binary
+sudo pip3 install -U yt-dlp
+
+# 3. Test the built-in server
+php -S 0.0.0.0:8080 -t public</code></pre>
+          </div>
+        </section>
+
+        <!-- 5. SYSTEMD SERVICE -->
+        <section id="systemd">
+          <h2>Systemd Service Setup</h2>
+          <p>Run Sounify Pi as an automatic, self-restarting background service on boot:</p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span>/etc/systemd/system/sounify-pi.service</span>
+              <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre><code>[Unit]
+Description=Sounify Pi Service (Music Downloader & Navidrome Sync)
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/sounify-pi
+ExecStart=/usr/bin/php -S 0.0.0.0:8080 -t /opt/sounify-pi/public /opt/sounify-pi/public/index.php
+Restart=always
+RestartSec=5
+Environment=PORT=8080
+Environment=PHP_CLI_SERVER_WORKERS=4
+
+[Install]
+WantedBy=multi-user.target</code></pre>
+          </div>
+
+          <p>Enable and start the service:</p>
+          <div class="code-block">
+            <div class="code-header">
+              <span>terminal</span>
+              <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre><code>sudo systemctl daemon-reload
+sudo systemctl enable --now sounify-pi.service
+sudo systemctl status sounify-pi</code></pre>
+          </div>
+        </section>
+
+        <!-- 6. FILE NAMING SCHEMES -->
+        <section id="naming">
+          <h2>Customizable File Naming Schemes</h2>
+          <p>
+            Configure how downloaded audio files are named in <strong>Settings &rarr; File Naming Scheme</strong>. Illegal filesystem characters (<code>/\:*?"&lt;&gt;|</code>) are automatically sanitized.
+          </p>
+
+          <div class="table-wrap">
+            <table class="doc-table">
+              <thead>
+                <tr>
+                  <th>Format Option</th>
+                  <th>Track Number Disabled</th>
+                  <th>Track Number Enabled</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Artist - Title</strong> (Default)</td>
+                  <td><code>Artist - Song Name.mp3</code></td>
+                  <td><code>01. Artist - Song Name.mp3</code></td>
+                </tr>
+                <tr>
+                  <td><strong>Title - Artist</strong></td>
+                  <td><code>Song Name - Artist.mp3</code></td>
+                  <td><code>01. Song Name - Artist.mp3</code></td>
+                </tr>
+                <tr>
+                  <td><strong>Title Only</strong></td>
+                  <td><code>Song Name.mp3</code></td>
+                  <td><code>01. Song Name.mp3</code></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- 7. METADATA & TAGS -->
+        <section id="metadata">
+          <h2>Year, Genre &amp; ID3v2.3 Tags</h2>
+          <p>
+            Sounify Pi embeds standardized ID3v2.3 tags directly into MP3 frames using FFmpeg, ensuring full compatibility with Windows Media Player, macOS Music, VLC, Android, and Navidrome:
+          </p>
+          <ul>
+            <li><strong>Release Year:</strong> Written to <code>date</code>, <code>year</code>, and ID3 frame <code>TYER</code>.</li>
+            <li><strong>Genre:</strong> Queried from keyless databases and written to <code>genre</code> and ID3 frame <code>TCON</code>.</li>
+            <li><strong>Track Number:</strong> Written to <code>track</code> (e.g. <code>1/12</code>).</li>
+            <li><strong>Attached Picture:</strong> Embeds the album cover as an attached JPEG picture stream.</li>
+          </ul>
+        </section>
+
+        <!-- 8. COVERS -->
+        <section id="covers">
+          <h2>Clean cover.jpg Standard (Zero Duplicates)</h2>
+          <p>
+            Unlike other downloaders that create multiple duplicate images per track (e.g. <code>folder.jpg</code>, <code>cover.jpg</code>, <code>track.jpg</code>), Sounify Pi strictly follows the <strong>Navidrome Best Practice Standard</strong>:
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span>Directory Structure</span>
+            </div>
+            <pre><code>storage/downloads/
+└── 4AMTapes/
+    └── Como Has Logrado/
+        ├── cover.jpg               <-- Single clean high-res album art
+        └── 4AMTapes - Como Has Logrado.mp3 (with embedded cover)</code></pre>
+          </div>
+        </section>
+
+        <!-- 9. PREVIEW -->
+        <section id="preview">
+          <h2>20-Second Audio Preview in Library</h2>
+          <p>
+            In the <strong>Library</strong> tab of the Sounify Pi app, each song row features a play button. Clicking it opens a floating player bar that streams the first 20 seconds of the song directly with a live timer and automatic stop.
+          </p>
+        </section>
+
+        <!-- 10. QUALITY -->
+        <section id="quality">
+          <h2>Audio Formats &amp; Bitrates</h2>
+          <p>Choose from multiple high-fidelity audio formats in the Settings tab:</p>
+          <ul>
+            <li><strong>MP3 320 kbps (CBR):</strong> Maximum compatibility across legacy media players, car dashboards, and smart speakers.</li>
+            <li><strong>MP3 256 / 192 kbps:</strong> Balanced file sizes for memory-constrained micro-SD storage.</li>
+            <li><strong>FLAC (Lossless):</strong> Uncompressed bit-perfect audio for audiophile collections.</li>
+            <li><strong>Opus / M4A:</strong> Modern high-efficiency audio codecs.</li>
+          </ul>
+        </section>
+
+        <!-- 11. NAVIDROME SYNC -->
+        <section id="navidrome">
+          <h2>Navidrome Subsonic Integration</h2>
+          <p>
+            When enabled in <strong>Settings &rarr; Navidrome Sync</strong>, Sounify Pi communicates with Navidrome's Subsonic API:
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span>Subsonic API Request</span>
+            </div>
+            <pre><code>GET {NAVIDROME_URL}/rest/startScan.view?u={USER}&t={TOKEN}&s={SALT}&v=1.16.1&c=sounify-pi&f=json</code></pre>
+          </div>
+          <p>
+            Whenever a track or album finishes downloading, Sounify Pi dispatches this call, prompting Navidrome to scan the album folder instantly so it appears in your mobile streaming apps right away.
+          </p>
+        </section>
+
+        <!-- 12. REST API -->
+        <section id="api">
+          <h2>REST API Reference</h2>
+          <p>Sounify Pi exposes a clean JSON REST API for automation and integration:</p>
+
+          <div class="table-wrap">
+            <table class="doc-table">
+              <thead>
+                <tr>
+                  <th>Endpoint</th>
+                  <th>Method</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>/api/resolve</code></td>
+                  <td><span class="badge-method badge-post">POST</span></td>
+                  <td>Scrapes metadata and tracklist from Spotify URL.</td>
+                </tr>
+                <tr>
+                  <td><code>/api/download</code></td>
+                  <td><span class="badge-method badge-post">POST</span></td>
+                  <td>Enqueues single track or full album download job.</td>
+                </tr>
+                <tr>
+                  <td><code>/api/jobs</code></td>
+                  <td><span class="badge-method badge-get">GET</span></td>
+                  <td>Returns live progress and status of active and recent downloads.</td>
+                </tr>
+                <tr>
+                  <td><code>/api/library</code></td>
+                  <td><span class="badge-method badge-get">GET</span></td>
+                  <td>Lists downloaded songs from disk and database.</td>
+                </tr>
+                <tr>
+                  <td><code>/api/stream?id=ID</code></td>
+                  <td><span class="badge-method badge-get">GET</span></td>
+                  <td>Streams audio preview with byte-range headers.</td>
+                </tr>
+                <tr>
+                  <td><code>/api/history</code></td>
+                  <td><span class="badge-method badge-get">GET</span></td>
+                  <td>Returns completed and failed download records.</td>
+                </tr>
+                <tr>
+                  <td><code>/api/settings</code></td>
+                  <td><span class="badge-method badge-get">GET/POST</span></td>
+                  <td>Reads or updates audio quality, naming scheme, and Navidrome config.</td>
+                </tr>
+                <tr>
+                  <td><code>/api/navidrome/scan</code></td>
+                  <td><span class="badge-method badge-post">POST</span></td>
+                  <td>Manually triggers an instant Navidrome library scan.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- 13. TROUBLESHOOTING -->
+        <section id="troubleshooting">
+          <h2>Troubleshooting &amp; Tips</h2>
+
+          <h3>Upgrading yt-dlp</h3>
+          <p>YouTube frequently updates its stream formats. Keep <code>yt-dlp</code> up to date with:</p>
+          <div class="code-block">
+            <div class="code-header">
+              <span>terminal</span>
+              <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre><code>sudo yt-dlp -U</code></pre>
+          </div>
+
+          <h3>Storage Permissions</h3>
+          <p>Ensure the user running Sounify Pi has write permissions on the download directory:</p>
+          <div class="code-block">
+            <div class="code-header">
+              <span>terminal</span>
+              <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre><code>sudo chown -R $USER:$USER storage/downloads/
+sudo chmod -R 775 storage/downloads/</code></pre>
+          </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="docs-footer">
+          <div>
+            &copy; 2026 Sounify Pi · Standalone Documentation &amp; Reference Guide
+          </div>
+          <div>
+            Built with Spotify Dark &amp; Light Aesthetics
+          </div>
+        </footer>
+
+      </article>
+    </main>
+
+    <!-- Right Table of Contents (On this page) -->
+    <aside class="docs-toc">
+      <div class="toc-title">On this page</div>
+      <ul class="toc-list">
+        <li><a href="#overview" class="toc-link">Overview &amp; Concept</a></li>
+        <li><a href="#pipeline" class="toc-link">4-Step Audio Pipeline</a></li>
+        <li><a href="#quickstart" class="toc-link">Quickstart (Docker)</a></li>
+        <li><a href="#orangepi" class="toc-link">Orange Pi Native</a></li>
+        <li><a href="#systemd" class="toc-link">Systemd Service</a></li>
+        <li><a href="#naming" class="toc-link">File Naming Schemes</a></li>
+        <li><a href="#metadata" class="toc-link">Year, Genre &amp; Tags</a></li>
+        <li><a href="#covers" class="toc-link">Single cover.jpg</a></li>
+        <li><a href="#preview" class="toc-link">20-Second Preview</a></li>
+        <li><a href="#quality" class="toc-link">Audio Formats</a></li>
+        <li><a href="#navidrome" class="toc-link">Navidrome Sync</a></li>
+        <li><a href="#api" class="toc-link">REST API Endpoints</a></li>
+        <li><a href="#troubleshooting" class="toc-link">Troubleshooting</a></li>
+      </ul>
+    </aside>
+
+  </div>
+
+  <script src="js/script.js"></script>
+</body>
+</html>

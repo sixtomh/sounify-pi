@@ -1,0 +1,20 @@
+{
+  "name": "sounify/sounify-pi",
+  "description": "Sounify Pi - Self-hosted music downloader in PHP with Navidrome synchronization and Spotify embed scraping without API keys",
+  "type": "project",
+  "license": "MIT",
+  "version": "1.0.0",
+  "authors": [
+    {
+      "name": "Sounify Pi Team"
+    }
+  ],
+  "require": {
+    "php": ">=8.2"
+  },
+  "autoload": {
+    "psr-4": {
+      "Sounify\\": "src/"
+    }
+  }
+}

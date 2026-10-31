@@ -1,0 +1,33 @@
+version: "3.8"
+
+services:
+  # Servidor Navidrome (si ya lo tienes instalado aparte, puedes omitir este servicio)
+  navidrome:
+    image: deluan/navidrome:latest
+    container_name: navidrome
+    ports:
+      - "4533:4533"
+    environment:
+      ND_SCANSCHEDULE: 1h
+      ND_LOGLEVEL: info
+      ND_SESSIONTIMEOUT: 24h
+    volumes:
+      - /mnt/musica:/music:ro       # Carpeta de música en tu Orange Pi
+      - ./data/navidrome:/data
+    restart: unless-stopped
+
+  # Sounify Pi - Descargador de Música y Sincronizador Navidrome
+  sounify-pi:
+    build: .
+    container_name: sounify-pi
+    ports:
+      - "8080:8080"
+    volumes:
+      # Montar la misma carpeta de música con permisos de escritura
+      - /mnt/musica:/app/storage/downloads:rw
+      - ./data/sounify:/app/storage
+    environment:
+      - TZ=America/Santo_Domingo
+    restart: unless-stopped
+    depends_on:
+      - navidrome

@@ -1,0 +1,16 @@
+[Unit]
+Description=Sounify Pi Service (Music Downloader & Navidrome Sync)
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/sounify-pi
+ExecStart=/usr/bin/php -S 0.0.0.0:8080 -t /opt/sounify-pi/public /opt/sounify-pi/public/index.php
+Restart=always
+RestartSec=5
+Environment=PORT=8080
+Environment=PHP_CLI_SERVER_WORKERS=4
+
+[Install]
+WantedBy=multi-user.target

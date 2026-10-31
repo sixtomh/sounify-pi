@@ -1,0 +1,29 @@
+# Composer
+vendor/
+composer.lock
+
+# SQLite Database & Storage
+storage/*.db
+storage/*.db-journal
+storage/*.db-wal
+storage/*.db-shm
+storage/downloads/*
+!storage/downloads/.gitkeep
+!storage/.gitkeep
+
+# Temporary tagging and transcoding files
+*.tagging_tmp.*
+temp_*
+
+# Logs and environment
+*.log
+.env
+cookies.txt
+
+# OS & Editor generated files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
