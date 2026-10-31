@@ -892,7 +892,7 @@ label {
    ======================================================== */
 @media (max-width: 768px) {
   .app-container {
-    padding: 0.75rem 0.65rem 3rem;
+    padding: 0.75rem 0.65rem 5.5rem;
   }
 
   .glass-panel {
@@ -903,7 +903,6 @@ label {
   /* Mobile Header Layout */
   .app-header {
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
     gap: 0.85rem;
@@ -924,41 +923,98 @@ label {
     font-size: 0.72rem;
   }
 
-  /* Unfold header actions so buttons sit beside brand and tabs drop to a clean full-width row */
   .header-actions {
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
-    justify-content: flex-end;
     gap: 0.5rem;
   }
 
+  /* Native Spotify-style Fixed Bottom Navigation Bar on Mobile */
   .nav-tabs {
-    order: 10;
-    width: 100%;
-    margin-top: 0.35rem;
-    overflow-x: auto;
-    white-space: nowrap;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    padding: 3px;
-    gap: 3px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100vw;
+    z-index: 99999;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    background: rgba(18, 18, 18, 0.95);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-top: 1px solid var(--border-color);
+    border-radius: 0 !important;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    padding: 6px 2px max(8px, env(safe-area-inset-bottom));
+    box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.5);
+    gap: 0;
+    margin: 0;
   }
 
-  .nav-tabs::-webkit-scrollbar {
-    display: none;
+  [data-theme="light"] .nav-tabs {
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.08);
   }
 
   .nav-tab {
-    padding: 0.5rem 0.8rem;
-    font-size: 0.8rem;
-    flex-shrink: 0;
-    gap: 0.35rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    padding: 6px 1px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    background: transparent !important;
+    box-shadow: none !important;
+    transition: color 0.15s ease, transform 0.15s ease;
+    min-width: 0;
+    position: relative;
+    border: none;
+  }
+
+  .nav-tab span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
   }
 
   .nav-tab svg {
-    width: 15px;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+
+  .nav-tab:hover, .nav-tab:active {
+    background: transparent !important;
+    color: var(--text-main);
+  }
+
+  .nav-tab.active {
+    color: var(--accent-primary) !important;
+    transform: scale(1.04);
+  }
+
+  .nav-tab.active svg {
+    stroke-width: 2.5;
+  }
+
+  .nav-tab .badge {
+    position: absolute;
+    top: 1px;
+    right: 50%;
+    transform: translateX(12px);
+    font-size: 0.6rem;
+    padding: 1px 4px;
+    min-width: 15px;
     height: 15px;
+    line-height: 13px;
+    border-radius: 999px;
   }
 
   .btn-theme-toggle {
