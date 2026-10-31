@@ -135,4 +135,4 @@ Open in your browser: `http://IP_OF_YOUR_ORANGE_PI:8080`
 ---
 
 ## 📄 License
-MIT License
+This project is licensed under the [MIT License](LICENSE.md).
