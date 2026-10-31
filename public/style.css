@@ -887,28 +887,380 @@ label {
   padding-top: 1.5rem;
 }
 
-@media (max-width: 680px) {
+/* ========================================================
+   RESPONSIVE DESIGN SYSTEM (MOBILE & TABLET OPTIMIZATIONS)
+   ======================================================== */
+@media (max-width: 768px) {
+  .app-container {
+    padding: 0.75rem 0.65rem 3rem;
+  }
+
+  .glass-panel {
+    padding: 1.25rem 1rem;
+    border-radius: var(--radius-md);
+  }
+
+  /* Mobile Header Layout */
   .app-header {
-    flex-direction: column;
-    align-items: flex-start;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.85rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.85rem;
   }
+
+  .brand {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .brand-title {
+    font-size: 1.2rem;
+  }
+
+  .brand-subtitle {
+    font-size: 0.72rem;
+  }
+
+  /* Unfold header actions so buttons sit beside brand and tabs drop to a clean full-width row */
+  .header-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
+
   .nav-tabs {
+    order: 10;
     width: 100%;
+    margin-top: 0.35rem;
     overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 3px;
+    gap: 3px;
   }
-  .settings-grid {
-    grid-template-columns: 1fr;
+
+  .nav-tabs::-webkit-scrollbar {
+    display: none;
   }
+
+  .nav-tab {
+    padding: 0.5rem 0.8rem;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+    gap: 0.35rem;
+  }
+
+  .nav-tab svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  .btn-theme-toggle {
+    width: 36px;
+    height: 36px;
+  }
+
+  .btn-theme-toggle svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* Search Section */
+  .search-card {
+    margin-bottom: 1.25rem;
+  }
+
+  .search-title-wrap h2 {
+    font-size: 1.15rem;
+  }
+
+  .search-desc {
+    font-size: 0.82rem;
+    margin-bottom: 1rem;
+  }
+
+  .url-input-group {
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+
+  .input-field-wrapper {
+    min-width: 0;
+    width: 100%;
+    padding: 0 0.85rem;
+  }
+
+  #resolve-btn {
+    width: 100%;
+    padding: 0.85rem;
+  }
+
+  /* Prevent iOS auto-zoom on inputs */
+  input[type="text"],
+  input[type="password"],
+  input[type="url"],
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+
+  /* Preview Card (Resolved Track/Album) */
   .preview-card {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
+    text-align: center;
+    padding: 1.25rem 1rem;
+    gap: 1rem;
   }
-  .home-banner {
+
+  .preview-cover {
+    width: 130px;
+    height: 130px;
+  }
+
+  .preview-meta {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .preview-title {
+    font-size: 1.2rem;
+  }
+
+  .preview-artist {
+    font-size: 0.9rem;
+  }
+
+  .preview-details {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.4rem 0.85rem;
+    font-size: 0.8rem;
+  }
+
+  #btn-download-single,
+  #btn-download-all {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Tracklist */
+  .track-item {
+    padding: 0.6rem 0.4rem;
+    gap: 0.5rem;
+  }
+
+  .track-left {
+    gap: 0.6rem;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .track-num {
+    width: 16px;
+    font-size: 0.8rem;
+  }
+
+  .track-thumb {
+    width: 36px;
+    height: 36px;
+  }
+
+  .track-name {
+    font-size: 0.88rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .track-sub {
+    font-size: 0.75rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .btn-download-track {
+    padding: 0.35rem 0.65rem;
+    font-size: 0.75rem;
+    flex-shrink: 0;
+  }
+
+  /* Library 20-Second Preview Player */
+  .preview-player-bar {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
+    gap: 0.65rem;
+    padding: 0.75rem 0.85rem;
   }
+
+  .preview-player-info {
+    width: 100%;
+    gap: 0.65rem;
+  }
+
+  .preview-player-progress-wrap {
+    width: 100%;
+    max-width: 100%;
+    flex: none;
+  }
+
   .library-filter-wrap {
     width: 100%;
+    margin-top: 0.5rem;
+  }
+
+  /* Library Table Mobile Responsive View */
+  .data-table th:nth-child(2),
+  .data-table td:nth-child(2),
+  .data-table th:nth-child(7),
+  .data-table td:nth-child(7) {
+    display: none !important;
+  }
+
+  /* Settings Mobile Grid */
+  .settings-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem;
+  }
+
+  .settings-card {
+    padding: 1.25rem 1rem;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  #credentials-inputs-group {
+    grid-template-columns: 1fr !important;
+  }
+
+  .navidrome-actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.6rem;
+  }
+
+  .navidrome-actions .btn-secondary,
+  .navidrome-actions .btn-ghost {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .settings-footer {
+    width: 100%;
+  }
+
+  .settings-footer > div {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch !important;
+  }
+
+  .settings-footer button[type="submit"] {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Small Screens (Phones <= 540px) */
+@media (max-width: 540px) {
+  /* Hide Album and Format to give full width to Song Title and Duration */
+  .data-table th:nth-child(4),
+  .data-table td:nth-child(4),
+  .data-table th:nth-child(5),
+  .data-table td:nth-child(5) {
+    display: none !important;
+  }
+
+  .data-table th,
+  .data-table td {
+    padding: 0.65rem 0.45rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.65rem;
+  }
+
+  .stat-card {
+    padding: 0.85rem 0.75rem;
+    gap: 0.6rem;
+  }
+
+  .stat-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .stat-icon svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .stat-value {
+    font-size: 1.15rem;
+  }
+
+  .stat-label {
+    font-size: 0.72rem;
+  }
+
+  .home-banner {
+    padding: 1.15rem 0.9rem;
+    gap: 0.85rem;
+  }
+
+  .home-banner h2 {
+    font-size: 1.1rem;
+  }
+
+  .home-banner p {
+    font-size: 0.8rem;
+  }
+
+  .home-actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.5rem;
+  }
+
+  .home-actions .btn-primary,
+  .home-actions .btn-secondary {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .recent-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.6rem;
+  }
+
+  .recent-track-card {
+    padding: 0.65rem;
+  }
+}
+
+/* Extra Small Screens (<= 360px) */
+@media (max-width: 360px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .recent-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .brand-title {
+    font-size: 1.05rem;
   }
 }
 

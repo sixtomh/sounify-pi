@@ -242,6 +242,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       to { opacity: 1; transform: translateY(0); }
     }
 
+    @media (max-width: 480px) {
+      body {
+        padding: 1.5rem 1rem;
+      }
+      h1.login-title {
+        font-size: 1.75rem;
+        margin-bottom: 1.5rem;
+      }
+      .login-container {
+        max-width: 100%;
+      }
+    }
+
     /* Hint / Footer */
     .login-footer-info {
       margin-top: 2.25rem;
