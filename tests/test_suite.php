@@ -47,13 +47,13 @@ assert(!empty($track['duration']), "Spotify track duration empty");
 echo "[PASS] 6. SpotifyScraper resolve track: {$track['title']}\n";
 
 // 7. Docs routing check
-$_SERVER['REQUEST_URI'] = '/Docs/';
+$_SERVER['REQUEST_URI'] = '/docs/';
 $_SERVER['REQUEST_METHOD'] = 'GET';
 ob_start();
 $app = new Sounify\App();
 $app->run();
 $docsHtml = ob_get_clean();
 assert(str_contains($docsHtml, 'Documentation &amp; Setup Guide') || str_contains($docsHtml, 'Documentation & Setup Guide'), "Docs page not served");
-echo "[PASS] 7. Documentation page routing (/Docs/ -> index.html)\n";
+echo "[PASS] 7. Documentation page routing (/docs/ -> index.html)\n";
 
 echo "\nALL TESTS PASSED SUCCESSFULLY!\n";
