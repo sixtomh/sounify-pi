@@ -56,4 +56,35 @@ $docsHtml = ob_get_clean();
 assert(str_contains($docsHtml, 'Documentation &amp; Setup Guide') || str_contains($docsHtml, 'Documentation & Setup Guide'), "Docs page not served");
 echo "[PASS] 7. Documentation page routing (/docs/ -> index.html)\n";
 
+// 8. AudioMatcher query test
+$matcher = new Sounify\Matcher\AudioMatcher();
+$matchId = $matcher->findBestMatch(['title' => 'Never Gonna Give You Up', 'artist' => 'Rick Astley', 'duration' => 213]);
+assert(!empty($matchId), "AudioMatcher failed to find match");
+echo "[PASS] 8. AudioMatcher YouTube resolution: {$matchId}\n";
+
+// 9. Track deletion API test (file & database record removal)
+$dummyFile = Sounify\Config::getDownloadDir() . '/dummy_to_delete.mp3';
+file_put_contents($dummyFile, 'DUMMY AUDIO DATA');
+$stmt = $pdo->prepare("INSERT INTO history (title, artist, album, duration, file_path, format) VALUES ('Test Song', 'Test Artist', 'Test Album', 120, :fp, 'mp3')");
+$stmt->execute([':fp' => $dummyFile]);
+$insertedId = (int) $pdo->lastInsertId();
+
+$_SERVER['REQUEST_URI'] = '/api/library/delete';
+$_SERVER['REQUEST_METHOD'] = 'POST';
+$_SESSION['sounify_authenticated'] = true;
+$_POST = ['id' => $insertedId];
+
+ob_start();
+$app = new Sounify\App();
+$app->run();
+$deleteRes = json_decode(ob_get_clean(), true);
+
+assert(isset($deleteRes['success']) && $deleteRes['success'] === true, "Track deletion API failed");
+assert(!file_exists($dummyFile), "Physical audio file was not deleted from disk");
+
+$checkStmt = $pdo->prepare("SELECT COUNT(*) FROM history WHERE id = :id");
+$checkStmt->execute([':id' => $insertedId]);
+assert((int)$checkStmt->fetchColumn() === 0, "Track record was not removed from SQLite database");
+echo "[PASS] 9. Delete track API (Disk file & database row successfully removed)\n";
+
 echo "\nALL TESTS PASSED SUCCESSFULLY!\n";

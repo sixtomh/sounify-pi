@@ -93,4 +93,15 @@ class CommandHelper
         self::$ffmpegCmd = 'ffmpeg';
         return self::$ffmpegCmd;
     }
+
+    public static function findBinary(string $name, string $fallback = ''): string
+    {
+        if ($name === 'ffmpeg') {
+            return self::getFfmpeg();
+        }
+        if ($name === 'yt-dlp') {
+            return self::getYtDlp();
+        }
+        return $fallback ?: $name;
+    }
 }

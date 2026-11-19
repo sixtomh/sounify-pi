@@ -6,19 +6,27 @@ namespace Sounify\Metadata;
 class MetadataEnricher
 {
     /**
-     * Completa el año y género musical usando iTunes Search API o heurísticas.
+     * Completa el año, género musical, álbum y número de pista usando iTunes Search API o heurísticas.
      */
     public function enrich(array $song): array
     {
         $year = $song['year'] ?? '';
         $genre = $song['genre'] ?? '';
+        $title = trim($song['title'] ?? $song['name'] ?? '');
+        $currentAlbum = trim($song['album'] ?? $song['album_name'] ?? '');
+        $order = $song['order'] ?? $song['track_number'] ?? null;
 
-        // Si ya tiene año y género, no hace falta consultar
-        if (!empty($year) && !empty($genre)) {
+        // Si el álbum está vacío, es 'single' o es idéntico al título, necesita enriquecimiento de álbum
+        $needsAlbum = ($currentAlbum === '' || strtolower($currentAlbum) === 'single' || strcasecmp($currentAlbum, $title) === 0);
+        $needsYear = empty($year);
+        $needsGenre = empty($genre);
+        $needsOrder = empty($order);
+
+        // Si ya tiene todo (año, género y álbum auténtico), no hace falta consultar
+        if (!$needsYear && !$needsGenre && !$needsAlbum) {
             return $song;
         }
 
-        $title = $song['title'] ?? $song['name'] ?? '';
         $artist = !empty($song['artists'][0]) ? $song['artists'][0] : ($song['artist'] ?? '');
         // Limpiar colaboraciones para la búsqueda (ej: "Lyry; IvanConly..." -> "Lyry")
         $primaryArtist = trim(explode(';', (string)$artist)[0]);
@@ -34,6 +42,13 @@ class MetadataEnricher
                 if (empty($song['release_date'])) {
                     $song['release_date'] = $meta['release_date'] ?? $meta['year'];
                 }
+            }
+            if (!empty($meta['album']) && $needsAlbum) {
+                $song['album'] = $meta['album'];
+                $song['album_name'] = $meta['album'];
+            }
+            if (!empty($meta['track_number']) && $needsOrder) {
+                $song['order'] = (int) $meta['track_number'];
             }
         }
 
@@ -76,6 +91,9 @@ class MetadataEnricher
                 $releaseDate = $item['releaseDate'] ?? '';
                 $year = $releaseDate ? substr($releaseDate, 0, 4) : '';
                 return [
+                    'album' => $item['collectionName'] ?? null,
+                    'track_number' => $item['trackNumber'] ?? null,
+                    'track_count' => $item['trackCount'] ?? null,
                     'genre' => $item['primaryGenreName'] ?? null,
                     'year' => $year ?: null,
                     'release_date' => $releaseDate ?: null,

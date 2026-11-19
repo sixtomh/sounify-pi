@@ -8,7 +8,8 @@ class M3uWriter
     public static function write(string $playlistName, array $downloadedFiles, string $baseDownloadDir): string
     {
         $safeName = preg_replace('/[\\/:*?"<>|]/', '', $playlistName);
-        $safeName = trim(preg_replace('/\s+/', ' ', $safeName)) ?: 'Playlist';
+        $safeName = trim(preg_replace('/\s+/', ' ', (string) $safeName));
+        $safeName = trim($safeName, ". \t\n\r\0\x0B") ?: 'Playlist';
 
         $playlistDir = rtrim($baseDownloadDir, '/') . '/Playlists';
         if (!is_dir($playlistDir)) {

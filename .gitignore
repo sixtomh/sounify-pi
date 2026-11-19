@@ -9,6 +9,8 @@ storage/*.db-wal
 storage/*.db-shm
 storage/downloads/*
 !storage/downloads/.gitkeep
+storage/covers/*
+!storage/covers/.gitkeep
 !storage/.gitkeep
 
 # Temporary tagging and transcoding files

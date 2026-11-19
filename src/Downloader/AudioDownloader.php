@@ -107,7 +107,9 @@ class AudioDownloader
             $this->updateJob($jobId, 20.0, 'Downloading audio stream...', 'downloading', null, $onProgress);
 
             $tempTemplate = "{$targetDir}/temp_{$jobId}.%(ext)s";
-            $escapedTemp = escapeshellarg($tempTemplate);
+            $escapedTemp = PHP_OS_FAMILY === 'Windows'
+                ? '"' . str_replace('"', '""', $tempTemplate) . '"'
+                : escapeshellarg($tempTemplate);
             $videoUrl = escapeshellarg("https://www.youtube.com/watch?v={$videoId}");
 
             $ytDlp = \Sounify\CommandHelper::getYtDlp();
@@ -196,8 +198,8 @@ class AudioDownloader
                 $tempCoverPath
             );
 
-            // 6. Save to history
-            $this->saveHistory($song, $finalAudioPath, $format);
+            // 6. Save to history & cache cover image
+            $this->saveHistory($song, $finalAudioPath, $format, $tempCoverPath);
 
             // 7. Notify Navidrome if enabled
             if (Config::getBool('navidrome_enabled', false) && Config::getBool('navidrome_auto_scan', true)) {
@@ -235,7 +237,9 @@ class AudioDownloader
     private function sanitizeFilename(string $str): string
     {
         $cleaned = preg_replace('/[\\/:*?"<>|]/', '', $str);
-        return trim(preg_replace('/\s+/', ' ', (string) $cleaned)) ?: 'Pista';
+        $cleaned = trim(preg_replace('/\s+/', ' ', (string) $cleaned));
+        $cleaned = trim($cleaned, ". \t\n\r\0\x0B");
+        return $cleaned ?: 'Pista';
     }
 
     private function updateJob(string $id, float $progress, string $message, string $status = 'downloading', ?string $outputPath = null, ?callable $onProgress = null): void
@@ -261,12 +265,12 @@ class AudioDownloader
         ]);
     }
 
-    private function saveHistory(array $song, string $filePath, string $format): void
+    private function saveHistory(array $song, string $filePath, string $format, ?string $tempCoverPath = null): void
     {
         $pdo = Database::get();
         $stmt = $pdo->prepare("
-            INSERT INTO history (spotify_id, title, artist, album, year, genre, duration, file_path, format)
-            VALUES (:sid, :t, :a, :alb, :yr, :gnr, :d, :fp, :fmt)
+            INSERT INTO history (spotify_id, title, artist, album, year, genre, duration, file_path, format, cover_url)
+            VALUES (:sid, :t, :a, :alb, :yr, :gnr, :d, :fp, :fmt, :c)
         ");
         $stmt->execute([
             ':sid' => $song['id'] ?? null,
@@ -278,6 +282,16 @@ class AudioDownloader
             ':d' => (int) ($song['duration'] ?? 0),
             ':fp' => $filePath,
             ':fmt' => $format,
+            ':c' => $song['cover_url'] ?? '',
         ]);
+
+        $newId = (int)$pdo->lastInsertId();
+        if ($newId > 0 && $tempCoverPath && file_exists($tempCoverPath) && filesize($tempCoverPath) > 400) {
+            $coversDir = dirname(__DIR__, 2) . '/storage/covers';
+            if (!is_dir($coversDir)) {
+                @mkdir($coversDir, 0755, true);
+            }
+            @copy($tempCoverPath, "{$coversDir}/{$newId}.jpg");
+        }
     }
 }

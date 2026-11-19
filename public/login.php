@@ -49,6 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Log in · Sounify Pi</title>
   <meta name="description" content="Log in to Sounify Pi on your local network.">
+  <link rel="icon" type="image/svg+xml" href="/logo.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -89,17 +90,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     .brand-icon {
-      width: 44px;
-      height: 44px;
-      color: #ffffff;
+      width: 52px;
+      height: 52px;
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    .brand-icon svg {
-      width: 40px;
-      height: 40px;
+    .brand-logo-img {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      object-fit: contain;
+      display: block;
     }
 
     /* Big Bold "Welcome back" Title */
@@ -284,11 +287,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- Top Sounify Logo -->
     <div class="brand-icon-wrap">
       <div class="brand-icon" title="Sounify Pi">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M9 18V5l12-2v13"></path>
-          <circle cx="6" cy="18" r="3"></circle>
-          <circle cx="18" cy="16" r="3"></circle>
-        </svg>
+        <img src="/logo.svg" alt="Sounify Pi Logo" class="brand-logo-img">
       </div>
     </div>
 

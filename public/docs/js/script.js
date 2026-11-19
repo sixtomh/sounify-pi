@@ -60,10 +60,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // 4. Scrollspy (Highlight Active Link in Sidebar & Table of Contents)
+  // 4. Scrollspy (Highlight Active Link in Sidebar)
   const sections = document.querySelectorAll('article section[id]');
   const sidebarLinks = document.querySelectorAll('.sidebar-link');
-  const tocLinks = document.querySelectorAll('.toc-link');
 
   function onScroll() {
     let currentId = '';
@@ -79,9 +78,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (currentId) {
       sidebarLinks.forEach(link => {
-        link.classList.toggle('active', link.getAttribute('href') === `#${currentId}`);
-      });
-      tocLinks.forEach(link => {
         link.classList.toggle('active', link.getAttribute('href') === `#${currentId}`);
       });
     }

@@ -85,6 +85,7 @@ class Database
 
         try { $pdo->exec("ALTER TABLE history ADD COLUMN year TEXT"); } catch (\Throwable) {}
         try { $pdo->exec("ALTER TABLE history ADD COLUMN genre TEXT"); } catch (\Throwable) {}
+        try { $pdo->exec("ALTER TABLE history ADD COLUMN cover_url TEXT"); } catch (\Throwable) {}
 
         // Índices para optimizar consultas de estado y listado
         try {

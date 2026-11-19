@@ -5,10 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sounify Pi · Music Downloader &amp; Navidrome Sync</title>
   <meta name="description" content="Self-hosted music downloader for Orange Pi with Spotify embed scraping without API keys and automatic Navidrome synchronization.">
+  <link rel="icon" type="image/svg+xml" href="/logo.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/style.css?v=1.2.0">
+  <link rel="stylesheet" href="/style.css?v=1.2.5">
 </head>
 <body>
   <div class="app-container">
@@ -16,16 +17,9 @@
     <header class="app-header">
       <div class="brand">
         <div class="brand-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M9 18V5l12-2v13"></path>
-            <circle cx="6" cy="18" r="3"></circle>
-            <circle cx="18" cy="16" r="3"></circle>
-          </svg>
+          <img src="/logo.svg" alt="Sounify Pi Logo" class="brand-logo-img">
         </div>
-        <div>
-          <h1 class="brand-title">Sounify <span>Pi</span></h1>
-          <p class="brand-subtitle">Music Downloader &amp; Navidrome Edition</p>
-        </div>
+        <h1 class="brand-title">Sounify <span>Pi</span></h1>
       </div>
 
       <!-- Main Navigation Menu -->
@@ -220,55 +214,92 @@
 
       <!-- 4. LIBRARY TAB -->
       <section class="tab-panel" id="panel-library">
-        <div class="glass-panel">
-          <div class="panel-header">
+        <div class="library-container">
+          
+          <!-- Library Header -->
+          <div class="library-header-row">
             <div>
-              <h2>Music Library</h2>
-              <p class="panel-subtitle">All songs stored in your Orange Pi library folder</p>
+              <h1 class="library-title">Library</h1>
+              <p class="library-stats-line" id="library-stats-line">0 tracks · 0 albums · 0 artists · 0 MB</p>
             </div>
-            <div class="library-filter-wrap">
-              <input type="text" id="library-search-input" class="form-control" placeholder="Filter by title, artist, or album...">
-            </div>
-          </div>
-
-          <!-- 20-second preview audio player container -->
-          <div id="library-preview-player" class="preview-player-bar" style="display: none;">
-            <div class="preview-player-info">
-              <button class="btn-play-mini playing" id="btn-player-stop" title="Stop Preview">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="1"></rect></svg>
+            <div class="library-header-actions">
+              <button type="button" class="btn-lib-action" id="btn-lib-refresh" title="Refresh library">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                <span>Refresh</span>
               </button>
-              <div>
-                <div class="preview-player-title" id="player-track-title">-</div>
-                <div class="preview-player-sub" id="player-track-artist">20-Second Preview</div>
-              </div>
-            </div>
-            <div class="preview-player-progress-wrap">
-              <span class="preview-player-time" id="player-curr-time">0:00</span>
-              <div class="preview-player-bar-track">
-                <div class="preview-player-bar-fill" id="player-progress-fill"></div>
-              </div>
-              <span class="preview-player-time">0:20</span>
             </div>
           </div>
 
-          <div class="table-responsive">
-            <table class="data-table">
+          <!-- Library Sub-tabs (Albums, Tracks) -->
+          <div class="library-subtabs-bar">
+            <button type="button" class="lib-subtab active" data-subtab="albums" id="subtab-albums">
+              ALBUMS <span class="lib-subtab-badge" id="badge-albums-count">0</span>
+            </button>
+            <button type="button" class="lib-subtab" data-subtab="tracks" id="subtab-tracks">
+              TRACKS <span class="lib-subtab-badge" id="badge-tracks-count">0</span>
+            </button>
+          </div>
+
+          <!-- Filter & Controls Toolbar -->
+          <div class="library-toolbar">
+            <div class="lib-search-box">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              <input type="text" id="library-search-input" placeholder="Search tracks, albums, artists..." autocomplete="off">
+              <button type="button" id="btn-lib-search-clear" class="btn-search-clear" style="display: none;" title="Clear search">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
+            </div>
+
+            <div class="lib-toolbar-right">
+              <div class="lib-sort-container">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 16 4 4 4-4"></path><path d="M7 20V4"></path><path d="m21 8-4-4-4 4"></path><path d="M17 4v16"></path></svg>
+                <select id="library-sort-select" class="lib-sort-select">
+                  <option value="recent">Recently added</option>
+                  <option value="title_asc">Title (A-Z)</option>
+                  <option value="artist_asc">Artist (A-Z)</option>
+                  <option value="album_asc">Album (A-Z)</option>
+                  <option value="year_desc">Release Date</option>
+                  <option value="duration_desc">Duration</option>
+                </select>
+              </div>
+
+              <div class="lib-view-toggles">
+                <button type="button" class="btn-view-toggle active" id="btn-view-grid" title="Grid View">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect></svg>
+                </button>
+                <button type="button" class="btn-view-toggle" id="btn-view-list" title="List View">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Grid View (Albums & Artists Cards - Image 2) -->
+          <div id="library-grid-view" class="library-grid-cards">
+            <!-- Dynamically populated by app.js -->
+          </div>
+
+          <!-- List View (Spotify Tracks Table - Image 1) -->
+          <div id="library-list-view" class="library-list-table-wrap" style="display: none;">
+            <table class="spotify-track-table">
               <thead>
                 <tr>
-                  <th style="width: 50px; text-align: center;">Play</th>
-                  <th style="width: 40px;">#</th>
-                  <th>Title &amp; Artist</th>
-                  <th>Album</th>
-                  <th>Format</th>
-                  <th>Duration</th>
-                  <th>File Location</th>
+                  <th style="width: 44px; text-align: center;">#</th>
+                  <th style="min-width: 240px;">TITLE</th>
+                  <th style="min-width: 170px;">ALBUM</th>
+                  <th style="width: 76px; text-align: center;">FORMAT</th>
+                  <th style="width: 120px;">ADDED ↑</th>
+                  <th style="width: 110px;">RELEASE DATE</th>
+                  <th style="width: 60px; text-align: right;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></th>
+                  <th style="width: 80px; text-align: center;"></th>
                 </tr>
               </thead>
               <tbody id="library-tbody">
-                <tr><td colspan="7" class="text-center" style="padding: 2rem;">Loading library...</td></tr>
+                <tr><td colspan="8" class="text-center" style="padding: 3rem; color: var(--text-dim);">Loading library...</td></tr>
               </tbody>
             </table>
           </div>
+
         </div>
       </section>
 
@@ -540,16 +571,12 @@
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
               <div style="display: flex; align-items: center; gap: 0.75rem;">
                 <div class="brand-icon" style="width: 36px; height: 36px;">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 30px; height: 30px;">
-                    <path d="M9 18V5l12-2v13"></path>
-                    <circle cx="6" cy="18" r="3"></circle>
-                    <circle cx="18" cy="16" r="3"></circle>
-                  </svg>
+                  <img src="/logo.svg" alt="Sounify Pi Logo" class="brand-logo-img" style="width: 36px; height: 36px;">
                 </div>
                 <div>
                   <h3 style="margin: 0; font-size: 1.05rem; display: flex; align-items: center; gap: 0.5rem;">
                     Sounify Pi
-                    <span style="font-size: 0.75rem; background: var(--accent-primary); color: #000; padding: 2px 8px; border-radius: 999px; font-weight: 700;">v1.0.0</span>
+                    <span style="font-size: 0.75rem; background: var(--accent-primary); color: #000; padding: 2px 8px; border-radius: 999px; font-weight: 700;">v1.2.0</span>
                   </h3>
                   <p class="card-desc" style="margin: 0.2rem 0 0 0;">Music Downloader &amp; Navidrome Synchronizer for Orange Pi / Linux</p>
                 </div>
@@ -567,10 +594,75 @@
 
     <!-- Footer -->
     <footer class="app-footer">
-      <p>Sounify Pi · Self-hosted on Orange Pi · Integrated with Navidrome Subsonic API · <a href="/docs.html" target="_blank" style="color: var(--accent-primary); text-decoration: underline;">View Documentation &amp; Setup Guide</a></p>
+      <p>Sounify Pi · Self-hosted on Orange Pi · Integrated with Navidrome Subsonic API · <a href="/docs/" target="_blank" style="color: var(--accent-primary); text-decoration: underline;">View Documentation &amp; Setup Guide</a></p>
     </footer>
   </div>
 
-  <script src="/app.js?v=1.1.0"></script>
+  <!-- Persistent Spotify Player Bar (Image 1 Bottom) -->
+  <footer id="spotify-player-bar" class="spotify-player-bar" style="display: none;">
+    <!-- Scrub Progress Line -->
+    <div class="sp-progress-container" id="player-seek-container" title="Seek track">
+      <div class="sp-progress-fill" id="player-progress-fill"></div>
+      <div class="sp-progress-thumb"></div>
+    </div>
+
+    <div class="sp-player-content">
+      <!-- Left: Current Track Thumbnail & Info -->
+      <div class="sp-track-col">
+        <img id="player-art" src="/api/cover" class="sp-cover-img" alt="Cover">
+        <div class="sp-track-text">
+          <div class="sp-title-line">
+            <span id="player-track-title" class="sp-track-title">-</span>
+            <span class="sp-eq-bars" id="player-eq-bars" style="display: none;">
+              <span></span><span></span><span></span>
+            </span>
+          </div>
+          <div id="player-track-artist" class="sp-track-artist">-</div>
+        </div>
+      </div>
+
+      <!-- Center: Playback Controls -->
+      <div class="sp-controls-col">
+        <div class="sp-buttons-row">
+          <button type="button" class="sp-icon-btn" id="btn-player-shuffle" title="Shuffle">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
+          </button>
+          <button type="button" class="sp-icon-btn" id="btn-player-prev" title="Previous Track">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><polygon points="19 20 9 12 19 4 19 20"></polygon><line x1="5" y1="19" x2="5" y2="5" stroke="currentColor" stroke-width="3"></line></svg>
+          </button>
+          <button type="button" class="sp-play-circle-btn" id="btn-player-toggle" title="Play / Pause">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" id="player-play-icon"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+          </button>
+          <button type="button" class="sp-icon-btn" id="btn-player-next" title="Next Track">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><polygon points="5 4 15 12 5 20 5 4"></polygon><line x1="19" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="3"></line></svg>
+          </button>
+          <button type="button" class="sp-icon-btn" id="btn-player-repeat" title="Repeat Track">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Right: Time & Volume & Sync -->
+      <div class="sp-options-col">
+        <span class="sp-time-text" id="player-time-display">0:00 / 0:00</span>
+        <button type="button" class="sp-icon-btn" id="btn-player-sync" title="Navidrome Sync Active">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </button>
+        <div class="sp-volume-group">
+          <button type="button" class="sp-icon-btn" id="btn-player-mute" title="Volume">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+          </button>
+          <div class="sp-volume-bar-wrap" id="volume-seek-bar">
+            <div class="sp-volume-bar-fill" id="volume-progress-fill" style="width: 80%;"></div>
+          </div>
+        </div>
+        <button type="button" class="sp-icon-btn" id="btn-player-close" title="Dismiss Player">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/app.js?v=1.2.5"></script>
 </body>
 </html>

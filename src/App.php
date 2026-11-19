@@ -101,8 +101,14 @@ class App
         $file = $publicDir . $uri;
         $realFile = realpath($file);
 
-        if ($realFile && is_dir($realFile) && file_exists($realFile . '/index.html')) {
-            $realFile = realpath($realFile . '/index.html');
+        if ($realFile && is_dir($realFile)) {
+            if (!str_ends_with($uri, '/')) {
+                $this->setHeader("Location: {$uri}/", true, 301);
+                exit;
+            }
+            if (file_exists($realFile . '/index.html')) {
+                $realFile = realpath($realFile . '/index.html');
+            }
         }
 
         $mimes = [
@@ -226,8 +232,8 @@ class App
             return;
         }
 
-        // Si la autenticación está activa y no está autenticado, denegar acceso a la API
-        if (!$this->isAuthenticated()) {
+        // Si la autenticación está activa y no está autenticado, denegar acceso a la API (excepto /api/cover para carátulas)
+        if ($uri !== '/api/cover' && !$this->isAuthenticated()) {
             $this->setResponseCode(401);
             echo json_encode([
                 'error' => true,
@@ -295,7 +301,101 @@ class App
             case '/api/library':
                 $pdo = Database::get();
                 $stmt = $pdo->query("SELECT * FROM history ORDER BY downloaded_at DESC");
-                echo json_encode(['success' => true, 'tracks' => $stmt->fetchAll()]);
+                $tracks = $stmt->fetchAll();
+                $totalBytes = 0;
+                foreach ($tracks as &$tr) {
+                    $fp = (string) ($tr['file_path'] ?? '');
+                    if ($fp !== '' && file_exists($fp)) {
+                        $sz = (int) filesize($fp);
+                        $tr['size'] = $sz;
+                        $totalBytes += $sz;
+                    } else {
+                        $tr['size'] = 0;
+                    }
+                }
+                unset($tr);
+                echo json_encode([
+                    'success' => true,
+                    'tracks' => $tracks,
+                    'total_size' => $totalBytes
+                ]);
+                return;
+
+            case '/api/library/delete':
+            case '/api/track/delete':
+                if ($method !== 'POST') {
+                    $this->setResponseCode(405);
+                    echo json_encode(['error' => true, 'message' => 'Method not allowed']);
+                    return;
+                }
+                $id = (int) ($input['id'] ?? ($_GET['id'] ?? 0));
+                if ($id <= 0) {
+                    $this->setResponseCode(400);
+                    echo json_encode(['error' => true, 'message' => 'Track ID is required']);
+                    return;
+                }
+                $pdo = Database::get();
+                $stmt = $pdo->prepare("SELECT * FROM history WHERE id = :id LIMIT 1");
+                $stmt->execute([':id' => $id]);
+                $track = $stmt->fetch();
+                if (!$track) {
+                    $this->setResponseCode(404);
+                    echo json_encode(['error' => true, 'message' => 'Track not found in library']);
+                    return;
+                }
+
+                $filePath = (string) ($track['file_path'] ?? '');
+                $fileDeleted = false;
+                if ($filePath !== '' && file_exists($filePath) && is_file($filePath)) {
+                    $fileDeleted = @unlink($filePath);
+
+                    // Si el directorio del álbum quedó vacío de audios, limpiar carátulas residuales
+                    $dir = dirname($filePath);
+                    $downloadDir = realpath(Config::getDownloadDir()) ?: Config::getDownloadDir();
+                    $realDir = realpath($dir) ?: $dir;
+                    if (is_dir($dir) && $realDir !== $downloadDir) {
+                        $remaining = glob($dir . '/*.{mp3,flac,m4a,opus,ogg}', GLOB_BRACE) ?: [];
+                        if (empty($remaining)) {
+                            foreach (glob($dir . '/*.{jpg,jpeg,png,webp}', GLOB_BRACE) ?: [] as $img) {
+                                @unlink($img);
+                            }
+                            @rmdir($dir);
+                        }
+                    }
+                }
+
+                $delStmt = $pdo->prepare("DELETE FROM history WHERE id = :id");
+                $delStmt->execute([':id' => $id]);
+
+                // Eliminar carátula en caché de storage/covers/{id}.jpg si existe
+                $cachedCover = dirname(__DIR__) . "/storage/covers/{$id}.jpg";
+                if (file_exists($cachedCover)) {
+                    @unlink($cachedCover);
+                }
+
+                // Limpiar de la lista de jobs si existía
+                try {
+                    $delJob = $pdo->prepare("DELETE FROM jobs WHERE output_path = :fp");
+                    $delJob->execute([':fp' => $filePath]);
+                } catch (\Throwable) {}
+
+                // Notificar rescan a Navidrome si está activo
+                if (Config::getBool('navidrome_enabled', false) && Config::getBool('navidrome_auto_scan', true)) {
+                    try {
+                        $navidrome = new NavidromeClient(
+                            Config::get('navidrome_url', 'http://127.0.0.1:4533'),
+                            Config::get('navidrome_user', ''),
+                            Config::get('navidrome_pass', '')
+                        );
+                        $navidrome->startScan();
+                    } catch (\Throwable) {}
+                }
+
+                echo json_encode([
+                    'success' => true,
+                    'message' => "Track '" . ($track['title'] ?? 'Track') . "' deleted from library and disk.",
+                    'file_deleted' => $fileDeleted
+                ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
                 return;
 
             case '/api/resolve':
@@ -379,6 +479,138 @@ class App
                 $pdo = Database::get();
                 $stmt = $pdo->query("SELECT * FROM history ORDER BY downloaded_at DESC LIMIT 100");
                 echo json_encode(['success' => true, 'history' => $stmt->fetchAll()]);
+                return;
+
+            case '/api/cover':
+                $id = (int) ($_GET['id'] ?? 0);
+                $album = trim((string)($_GET['album'] ?? ''));
+                $coverPath = null;
+                $pdo = Database::get();
+
+                $cacheDir = dirname(__DIR__) . '/storage/covers';
+                if (!is_dir($cacheDir)) {
+                    @mkdir($cacheDir, 0755, true);
+                }
+
+                if ($id > 0) {
+                    $cachedFile = "{$cacheDir}/{$id}.jpg";
+                    if (file_exists($cachedFile) && filesize($cachedFile) > 400) {
+                        $coverPath = $cachedFile;
+                    } else {
+                        $stmt = $pdo->prepare("SELECT * FROM history WHERE id = :id LIMIT 1");
+                        $stmt->execute([':id' => $id]);
+                        $t = $stmt->fetch();
+                        if ($t) {
+                            $fp = (string)($t['file_path'] ?? '');
+                            if ($fp !== '' && file_exists($fp)) {
+                                $dir = dirname($fp);
+                                $base = pathinfo($fp, PATHINFO_FILENAME);
+                                foreach (["{$dir}/cover.jpg", "{$dir}/cover.png", "{$dir}/{$base}.jpg", "{$dir}/folder.jpg"] as $img) {
+                                    if (file_exists($img) && filesize($img) > 400) {
+                                        $coverPath = $img;
+                                        break;
+                                    }
+                                }
+                                // Extraer portada incrustada del audio mediante ffmpeg
+                                if (!$coverPath) {
+                                    $ffmpeg = CommandHelper::getFfmpeg();
+                                    $cmd = sprintf('%s -y -i %s -an -vcodec copy -frames:v 1 -update 1 %s 2>&1',
+                                        escapeshellarg($ffmpeg),
+                                        escapeshellarg($fp),
+                                        escapeshellarg($cachedFile)
+                                    );
+                                    @exec($cmd);
+                                    if (file_exists($cachedFile) && filesize($cachedFile) > 400) {
+                                        $coverPath = $cachedFile;
+                                    }
+                                }
+                            }
+                            // Fallback a URL de portada original de Spotify si ffmpeg no extrajo imagen
+                            if (!$coverPath) {
+                                $coverUrl = (string)($t['cover_url'] ?? '');
+                                if (!$coverUrl && !empty($t['title'])) {
+                                    $stmtC = $pdo->prepare("SELECT cover_url FROM jobs WHERE title = :t AND cover_url IS NOT NULL AND cover_url != '' ORDER BY created_at DESC LIMIT 1");
+                                    $stmtC->execute([':t' => $t['title']]);
+                                    $coverUrl = (string)$stmtC->fetchColumn();
+                                }
+                                if ($coverUrl) {
+                                    $cData = @file_get_contents($coverUrl);
+                                    if ($cData && strlen($cData) > 500) {
+                                        @file_put_contents($cachedFile, $cData);
+                                        if (file_exists($cachedFile) && filesize($cachedFile) > 400) {
+                                            $coverPath = $cachedFile;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } elseif ($album !== '') {
+                    $stmt = $pdo->prepare("SELECT * FROM history WHERE album = :album AND file_path IS NOT NULL LIMIT 1");
+                    $stmt->execute([':album' => $album]);
+                    $t = $stmt->fetch();
+                    if ($t) {
+                        $tid = (int)$t['id'];
+                        $cachedFile = "{$cacheDir}/{$tid}.jpg";
+                        if (file_exists($cachedFile) && filesize($cachedFile) > 400) {
+                            $coverPath = $cachedFile;
+                        } else {
+                            $fp = (string)($t['file_path'] ?? '');
+                            if ($fp !== '' && file_exists($fp)) {
+                                $dir = dirname($fp);
+                                $base = pathinfo($fp, PATHINFO_FILENAME);
+                                foreach (["{$dir}/cover.jpg", "{$dir}/cover.png", "{$dir}/{$base}.jpg", "{$dir}/folder.jpg"] as $img) {
+                                    if (file_exists($img) && filesize($img) > 400) {
+                                        $coverPath = $img;
+                                        break;
+                                    }
+                                }
+                                if (!$coverPath) {
+                                    $ffmpeg = CommandHelper::getFfmpeg();
+                                    $cmd = sprintf('%s -y -i %s -an -vcodec copy -frames:v 1 -update 1 %s 2>&1',
+                                        escapeshellarg($ffmpeg),
+                                        escapeshellarg($fp),
+                                        escapeshellarg($cachedFile)
+                                    );
+                                    @exec($cmd);
+                                    if (file_exists($cachedFile) && filesize($cachedFile) > 400) {
+                                        $coverPath = $cachedFile;
+                                    }
+                                }
+                            }
+                            if (!$coverPath) {
+                                $coverUrl = (string)($t['cover_url'] ?? '');
+                                if (!$coverUrl && !empty($t['album'])) {
+                                    $stmtC = $pdo->prepare("SELECT cover_url FROM jobs WHERE album = :alb AND cover_url IS NOT NULL AND cover_url != '' ORDER BY created_at DESC LIMIT 1");
+                                    $stmtC->execute([':alb' => $t['album']]);
+                                    $coverUrl = (string)$stmtC->fetchColumn();
+                                }
+                                if ($coverUrl) {
+                                    $cData = @file_get_contents($coverUrl);
+                                    if ($cData && strlen($cData) > 500) {
+                                        @file_put_contents($cachedFile, $cData);
+                                        if (file_exists($cachedFile) && filesize($cachedFile) > 400) {
+                                            $coverPath = $cachedFile;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if ($coverPath && file_exists($coverPath) && filesize($coverPath) > 200) {
+                    $mime = str_ends_with(strtolower($coverPath), '.png') ? 'image/png' : 'image/jpeg';
+                    $this->setHeader("Content-Type: {$mime}");
+                    $this->setHeader('Cache-Control: public, max-age=86400');
+                    readfile($coverPath);
+                    return;
+                }
+
+                // Default SVG artwork placeholder (sin caché para permitir actualización inmediata)
+                $this->setHeader('Content-Type: image/svg+xml');
+                $this->setHeader('Cache-Control: no-cache, no-store, must-revalidate');
+                echo '<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#242424"/><stop offset="100%" stop-color="#121212"/></linearGradient></defs><rect width="300" height="300" fill="url(#g)"/><circle cx="150" cy="150" r="46" fill="#181818"/><path d="M140 166V126l32-9v49m-32 0a12 12 0 1 1-12-12 12 12 0 0 1 12 12zm32-9a12 12 0 1 1-12-12 12 12 0 0 1 12 12z" fill="#1ed760"/></svg>';
                 return;
 
             case '/api/stream':
@@ -529,6 +761,9 @@ class App
                                 if ($item->isDir()) {
                                     @rmdir($real);
                                 } elseif ($item->isFile()) {
+                                    if (basename($real) === '.gitkeep') {
+                                        continue;
+                                    }
                                     if (file_exists($real) && @unlink($real)) {
                                         $deletedFilesCount++;
                                     }

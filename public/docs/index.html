@@ -5,10 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sounify Pi · Documentation &amp; Setup Guide</title>
   <meta name="description" content="Official documentation and setup guide for Sounify Pi - Self-hosted music downloader and automated Navidrome synchronizer for Orange Pi without API keys.">
+  <link rel="icon" type="image/svg+xml" href="logo.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style.css?v=1.2.0">
   <script>
     (function() {
       const savedTheme = localStorage.getItem('sounify-theme') || 
@@ -29,11 +30,7 @@
       <!-- Sounify Pi Brand Logo -->
       <a href="index.html" class="brand-wrap">
         <div class="brand-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M9 18V5l12-2v13"></path>
-            <circle cx="6" cy="18" r="3"></circle>
-            <circle cx="18" cy="16" r="3"></circle>
-          </svg>
+          <img src="logo.svg" alt="Sounify Pi Logo" class="brand-logo-img">
         </div>
         <div class="brand-text">
           <span class="brand-title">Sounify <span>Pi</span></span>
@@ -81,34 +78,135 @@
     <!-- Left Navigation Sidebar -->
     <aside class="docs-sidebar" id="docs-sidebar">
       
+      <!-- Home Button at top (Downtify Standard) -->
+      <a href="#home" class="sidebar-link active" style="margin-bottom: 1.25rem; font-weight: 700; background: var(--bg-card-hover); border-left: 3px solid var(--accent);">
+        <svg class="sidebar-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>
+        <span>Home</span>
+      </a>
+
       <div class="sidebar-group">
         <div class="sidebar-title">Getting Started</div>
         <ul class="sidebar-list">
-          <li><a href="#overview" class="sidebar-link active">Overview &amp; Concept</a></li>
-          <li><a href="#pipeline" class="sidebar-link">4-Step Audio Pipeline</a></li>
-          <li><a href="#quickstart" class="sidebar-link">Quickstart (Docker)</a></li>
-          <li><a href="#orangepi" class="sidebar-link">Orange Pi Native Setup</a></li>
-          <li><a href="#systemd" class="sidebar-link">Systemd Service Daemon</a></li>
+          <li>
+            <a href="#overview" class="sidebar-link">
+              <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+              <span>Overview &amp; Concept</span>
+            </a>
+          </li>
+          <li>
+            <a href="#how-it-works" class="sidebar-link">
+              <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+              <span>How It Works</span>
+            </a>
+          </li>
+          <li>
+            <a href="#pipeline" class="sidebar-link">
+              <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+              <span>4-Step Pipeline</span>
+            </a>
+          </li>
+          <li>
+            <a href="#one-click" class="sidebar-link" style="display: flex; justify-content: space-between; align-items: center;">
+              <div style="display: flex; align-items: center; gap: 0.65rem;">
+                <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 4.1L12 6M5.1 8l-2.9-.8M6 12l-1.9 2M7.2 2.2L8 5.1m1.037 4.59a.498.498 0 0 1 .653-.653l11 4.5a.5.5 0 0 1-.074.949l-4.349 1.041a1 1 0 0 0-.74.739l-1.04 4.35a.5.5 0 0 1-.95.074z"></path></svg>
+                <span>One-Click Install</span>
+              </div>
+              <span style="font-size: 0.65rem; background: var(--accent); color: #000; padding: 1px 6px; border-radius: 99px; font-weight: 800;">EASY</span>
+            </a>
+          </li>
+          <li>
+            <a href="#quickstart" class="sidebar-link">
+              <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"></path><path d="M14 2v5a1 1 0 0 0 1 1h5m-10 4.5L8 15l2 2.5m4-5l2 2.5l-2 2.5"></path></svg>
+              <span>Quickstart (Docker)</span>
+            </a>
+          </li>
+          <li>
+            <a href="#orangepi" class="sidebar-link">
+              <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="14" x2="23" y2="14"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="14" x2="4" y2="14"></line></svg>
+              <span>Orange Pi Native</span>
+            </a>
+          </li>
+          <li>
+            <a href="#systemd" class="sidebar-link">
+              <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+              <span>Systemd Service</span>
+            </a>
+          </li>
         </ul>
       </div>
 
       <div class="sidebar-group">
         <div class="sidebar-title">Features &amp; Settings</div>
         <ul class="sidebar-list">
-          <li><a href="#naming" class="sidebar-link">File Naming Schemes</a></li>
-          <li><a href="#metadata" class="sidebar-link">Year, Genre &amp; ID3v2.3</a></li>
-          <li><a href="#covers" class="sidebar-link">Single cover.jpg Standard</a></li>
-          <li><a href="#preview" class="sidebar-link">20-Second Audio Preview</a></li>
-          <li><a href="#quality" class="sidebar-link">Audio Formats &amp; Bitrates</a></li>
+          <li>
+            <a href="#naming" class="sidebar-link">
+              <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+              <span>File Naming Schemes</span>
+            </a>
+          </li>
+          <li>
+            <a href="#metadata" class="sidebar-link">
+              <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
+              <span>Year, Genre &amp; Tags</span>
+            </a>
+          </li>
+          <li>
+            <a href="#covers" class="sidebar-link">
+              <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+              <span>Single cover.jpg</span>
+            </a>
+          </li>
+          <li>
+            <a href="#preview" class="sidebar-link">
+              <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"></path><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path></svg>
+              <span>20-Second Preview</span>
+            </a>
+          </li>
+          <li>
+            <a href="#quality" class="sidebar-link">
+              <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
+              <span>Audio Formats</span>
+            </a>
+          </li>
         </ul>
       </div>
 
       <div class="sidebar-group">
         <div class="sidebar-title">Integrations &amp; API</div>
         <ul class="sidebar-list">
-          <li><a href="#navidrome" class="sidebar-link">Navidrome Subsonic Sync</a></li>
-          <li><a href="#api" class="sidebar-link">REST API Endpoints</a></li>
-          <li><a href="#troubleshooting" class="sidebar-link">Troubleshooting &amp; Tips</a></li>
+          <li>
+            <a href="#navidrome" class="sidebar-link">
+              <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+              <span>Navidrome Sync</span>
+            </a>
+          </li>
+          <li>
+            <a href="#api" class="sidebar-link">
+              <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+              <span>REST API Endpoints</span>
+            </a>
+          </li>
+          <li>
+            <a href="#troubleshooting" class="sidebar-link">
+              <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="4"></circle><line x1="4.93" y1="4.93" x2="9.17" y2="9.17"></line><line x1="14.83" y1="14.83" x2="19.07" y2="19.07"></line><line x1="14.83" y1="9.17" x2="19.07" y2="4.93"></line><line x1="4.93" y1="19.07" x2="9.17" y2="14.83"></line></svg>
+              <span>Troubleshooting</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="sidebar-group">
+        <div class="sidebar-title">Releases &amp; Updates</div>
+        <ul class="sidebar-list">
+          <li>
+            <a href="#changelog" class="sidebar-link" style="display: flex; justify-content: space-between; align-items: center;">
+              <div style="display: flex; align-items: center; gap: 0.65rem;">
+                <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+                <span>Changelog</span>
+              </div>
+              <span style="font-size: 0.65rem; background: var(--accent); color: #000; padding: 1px 6px; border-radius: 99px; font-weight: 800;">v1.2.0</span>
+            </a>
+          </li>
         </ul>
       </div>
 
@@ -118,20 +216,183 @@
     <main class="docs-main">
       <article>
         
-        <!-- Hero Introduction -->
-        <div class="doc-hero">
-          <h1>Sounify <span>Pi</span> Documentation</h1>
-          <p class="doc-hero-lead">
-            The lightweight, self-hosted music downloader and automated library synchronizer engineered for Orange Pi (ARM64) and Navidrome servers.
-          </p>
-          <div class="badge-row">
-            <span class="meta-badge highlight">v1.2.0</span>
-            <span class="meta-badge">Orange Pi &amp; SBC Ready</span>
-            <span class="meta-badge">Zero API Keys</span>
-            <span class="meta-badge">Navidrome Subsonic Auto-Sync</span>
-            <span class="meta-badge">ID3v2.3 + Year &amp; Genre</span>
+        <!-- HOME SECTION (MATCHING DOWNTIFY HOME STANDARD) -->
+        <section id="home">
+          <div class="home-hero-wrap">
+            <div class="home-hero-icon">
+              <svg viewBox="0 0 24 24" width="60" height="60" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 18V5l12-2v13"></path>
+                <circle cx="6" cy="18" r="3"></circle>
+                <circle cx="18" cy="16" r="3"></circle>
+              </svg>
+            </div>
+            <div class="home-eyebrow">Self-hosted music downloader &amp; Navidrome sync</div>
+            <h1 class="home-hero-title">Sounify <span>Pi</span></h1>
+            <p class="home-hero-desc">
+              The music downloader you can host on your Orange Pi or home server. Drop a Spotify link, get a fully tagged audio file. No account, no API key, no Premium.
+            </p>
+            <div class="home-cta-row">
+              <a href="#one-click" class="btn-cta-primary">
+                Get started
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14m-7-7l7 7l-7 7"></path></svg>
+              </a>
+              <a href="/" class="btn-cta-secondary">
+                Launch Web App
+              </a>
+              <a href="https://github.com/sixtomh/sounify-pi" target="_blank" rel="noopener" class="btn-cta-secondary">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12c0 5.303 3.438 9.8 8.205 11.385c.6.113.82-.258.82-.577c0-.285-.01-1.04-.015-2.04c-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729c1.205.084 1.838 1.236 1.838 1.236c1.07 1.835 2.809 1.305 3.495.998c.108-.776.417-1.305.76-1.605c-2.665-.3-5.466-1.332-5.466-5.93c0-1.31.465-2.38 1.235-3.22c-.135-.303-.54-1.523.105-3.176c0 0 1.005-.322 3.3 1.23c.96-.267 1.98-.399 3-.405c1.02.006 2.04.138 3 .405c2.28-1.552 3.285-1.23 3.285-1.23c.645 1.653.24 2.873.12 3.176c.765.84 1.23 1.91 1.23 3.22c0 4.61-2.805 5.625-5.475 5.92c.42.36.81 1.096.81 2.22c0 1.606-.015 2.896-.015 3.286c0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+                GitHub
+              </a>
+            </div>
+            <div class="badge-row">
+              <span class="meta-badge highlight">v1.2.0 Latest</span>
+              <span class="meta-badge">Orange Pi &amp; ARM64</span>
+              <span class="meta-badge">Zero API Keys</span>
+              <span class="meta-badge">Navidrome Subsonic Auto-Sync</span>
+              <span class="meta-badge">MIT License</span>
+            </div>
           </div>
-        </div>
+
+          <!-- How It Works Pipeline Flow (Downtify Standard) -->
+          <h3>How it actually works</h3>
+          <p>
+            Spotify's official API gates downloads behind a Premium subscription. Sounify Pi takes the side door instead &mdash; it reads the metadata Spotify already exposes on its public embed pages, asks YouTube Music for the closest matching audio, hands the file to <code>yt-dlp</code> and <code>ffmpeg</code>, and writes proper tags. The whole pipeline lives in your Orange Pi or local server.
+          </p>
+
+          <div class="home-pipeline-flow">
+            <div class="home-flow-card">
+              <span class="home-flow-num">1</span>
+              <div>
+                <div class="home-flow-title">Spotify embed</div>
+                <div class="home-flow-sub">keyless metadata</div>
+              </div>
+            </div>
+            <div class="home-flow-arrow">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14m-7-7l7 7l-7 7"/></svg>
+            </div>
+            <div class="home-flow-card">
+              <span class="home-flow-num">2</span>
+              <div>
+                <div class="home-flow-title">YouTube Music</div>
+                <div class="home-flow-sub">clean audio match</div>
+              </div>
+            </div>
+            <div class="home-flow-arrow">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14m-7-7l7 7l-7 7"/></svg>
+            </div>
+            <div class="home-flow-card">
+              <span class="home-flow-num">3</span>
+              <div>
+                <div class="home-flow-title">yt-dlp · ffmpeg · Navidrome</div>
+                <div class="home-flow-sub">download, tag &amp; auto-sync</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- What You Can Paste In Table (Downtify Standard) -->
+          <h3>What you can paste in</h3>
+          <div class="table-wrap">
+            <table class="doc-table">
+              <thead>
+                <tr>
+                  <th>Input Source</th>
+                  <th>Example Format</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Spotify track</strong></td>
+                  <td><code>https://open.spotify.com/track/4cOdK2wGLETKBW3PvgPWqT</code></td>
+                </tr>
+                <tr>
+                  <td><strong>Spotify album</strong></td>
+                  <td><code>https://open.spotify.com/album/4m2880jivSbbyEGAKfITCa</code></td>
+                </tr>
+                <tr>
+                  <td><strong>Spotify playlist</strong></td>
+                  <td><code>https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M</code></td>
+                </tr>
+                <tr>
+                  <td><strong>YouTube / YouTube Music</strong></td>
+                  <td><code>https://www.youtube.com/watch?v=dQw4w9WgXcQ</code></td>
+                </tr>
+                <tr>
+                  <td><strong>Free-text search</strong></td>
+                  <td><code>Queen - Bohemian Rhapsody</code></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Highlights (Downtify Standard) -->
+          <h3>Highlights</h3>
+          <div class="home-highlights-grid">
+            <a href="#covers" class="home-highlight-card">
+              <div class="home-highlight-icon-wrap">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+              </div>
+              <div class="home-highlight-title">Single cover.jpg Standard</div>
+              <p class="home-highlight-desc">Clean single album art alongside audio for instant Navidrome and file explorer detection with zero duplicate image files.</p>
+            </a>
+
+            <a href="#quality" class="home-highlight-card">
+              <div class="home-highlight-icon-wrap">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line></svg>
+              </div>
+              <div class="home-highlight-title">Four Audio Formats</div>
+              <p class="home-highlight-desc">MP3 (up to 320 kbps), FLAC (lossless), M4A and OPUS &mdash; at the quality and bitrate of your choice.</p>
+            </a>
+
+            <a href="#preview" class="home-highlight-card">
+              <div class="home-highlight-icon-wrap">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"></path><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path></svg>
+              </div>
+              <div class="home-highlight-title">20-Second Preview</div>
+              <p class="home-highlight-desc">Web player built into your Music Library with HTTP byte-range audio streaming and live timer.</p>
+            </a>
+
+            <a href="#navidrome" class="home-highlight-card">
+              <div class="home-highlight-icon-wrap">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+              </div>
+              <div class="home-highlight-title">Navidrome Auto-Sync</div>
+              <p class="home-highlight-desc">Dispatches Subsonic API startScan calls as soon as each track finishes for instant mobile playback.</p>
+            </a>
+
+            <a href="#api" class="home-highlight-card">
+              <div class="home-highlight-icon-wrap">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+              </div>
+              <div class="home-highlight-title">Single-Track Deletion</div>
+              <p class="home-highlight-desc">One-click trash button in the Library view to permanently delete unliked songs from disk and database.</p>
+            </a>
+
+            <a href="#one-click" class="home-highlight-card">
+              <div class="home-highlight-icon-wrap">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 4.1L12 6M5.1 8l-2.9-.8M6 12l-1.9 2M7.2 2.2L8 5.1m1.037 4.59a.498.498 0 0 1 .653-.653l11 4.5a.5.5 0 0 1-.074.949l-4.349 1.041a1 1 0 0 0-.74.739l-1.04 4.35a.5.5 0 0 1-.95.074z"></path></svg>
+              </div>
+              <div class="home-highlight-title">One-Click Install</div>
+              <p class="home-highlight-desc">Available for CasaOS, Umbrel, HomeDock OS and automated 1-line bash script on Orange Pi &amp; Linux.</p>
+            </a>
+          </div>
+
+          <!-- One command and you're done (Downtify Standard) -->
+          <h3>One command and you're done</h3>
+          <div class="code-block">
+            <div class="code-header">
+              <span>terminal</span>
+              <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre><code>docker run -d -p 8080:8080 --name sounify-pi \
+  -v /mnt/storage/music:/app/storage/downloads \
+  -v sounify_data:/app/storage \
+  --restart unless-stopped \
+  sounify/sounify-pi</code></pre>
+          </div>
+          <p>
+            Open <a href="http://localhost:8080" target="_blank" rel="noreferrer"><code>localhost:8080</code></a>, paste a link, hit download. Files land in <code>storage/downloads</code> with ID3v2.3 tags and album cover art already in place.
+          </p>
+        </section>
 
         <!-- 1. OVERVIEW -->
         <section id="overview">
@@ -151,6 +412,227 @@
             <p>
               It parses public Spotify embed pages (<code>open.spotify.com/embed</code>) to extract tracklists and artwork, enriches missing Release Year and Genre using the free iTunes Search API, pulls official high-fidelity audio matches from YouTube Music via <code>yt-dlp</code>, embeds ID3v2.3 tags, and immediately prompts Navidrome to scan the newly downloaded album.
             </p>
+          </div>
+        </section>
+
+        <!-- HOW IT WORKS -->
+        <section id="how-it-works">
+          <div class="doc-breadcrumb">
+            <span>Getting Started</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 6 6 6-6 6"></path></svg>
+            <span class="current">How It Works</span>
+          </div>
+
+          <h2>How Sounify Pi Works Under the Hood</h2>
+          <p>
+            Unlike traditional music downloaders that demand Spotify Premium credentials, browser emulators, or fragile developer tokens, Sounify Pi operates on a completely <strong>decoupled architecture</strong>. It treats Spotify solely as a rich public metadata catalog and sources high-fidelity audio streams from YouTube Music.
+          </p>
+
+          <div class="callout" style="margin: 1.5rem 0;">
+            <div class="callout-title">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+              The Core Architecture Insight
+            </div>
+            <p>
+              Spotify encrypts actual audio tracks with Widevine DRM and restricts developer APIs behind rate limits and logins. However, Spotify publishes full track names, ISRC codes, artist rosters, album names, track durations, and high-resolution cover artwork freely across its public web embed system. Sounify Pi captures this pristine metadata and uses it to find the identical studio audio master on YouTube Music.
+            </p>
+          </div>
+
+          <h3>Technical Execution Flow</h3>
+
+          <div class="hiw-step-list">
+            <div class="hiw-step-item">
+              <div class="hiw-step-header">
+                <div class="hiw-step-badge">
+                  <span class="hiw-step-num">1</span>
+                  <span>Public Embed Scraping (No API Key)</span>
+                </div>
+                <span class="hiw-step-tag">src/Scraper/SpotifyScraper.php</span>
+              </div>
+              <h4>Server-Side DOM &amp; JSON State Extraction</h4>
+              <p>
+                When you input a Spotify URL (track, album, or playlist), Sounify Pi requests the lightweight public embed endpoint (<code>https://open.spotify.com/embed/...</code>) with optimized HTTP headers.
+              </p>
+              <p>
+                It parses the embedded hydration payload (<code>&lt;script id="__NEXT_DATA__"&gt;</code>) or regex-matches the track state tree. This extracts clean track titles, artist names, album titles, duration in milliseconds, and the highest resolution artwork URL (typically 640&times;640 or uncompressed CDN assets) in under 200ms without sending a single API request to Spotify's gated endpoints.
+              </p>
+              <div class="hiw-features">
+                <div class="hiw-feat-pill">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Zero Spotify credentials needed</span>
+                </div>
+                <div class="hiw-feat-pill">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Supports Tracks, Albums &amp; Playlists</span>
+                </div>
+                <div class="hiw-feat-pill">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Under 250ms parse time</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="hiw-step-item">
+              <div class="hiw-step-header">
+                <div class="hiw-step-badge">
+                  <span class="hiw-step-num">2</span>
+                  <span>Metadata Enrichment</span>
+                </div>
+                <span class="hiw-step-tag">src/Metadata/MetadataEnricher.php</span>
+              </div>
+              <h4>Year, Genre &amp; Disc Tag Completion</h4>
+              <p>
+                Spotify embed payloads often omit the release year and primary musical genre. Sounify Pi automatically queries the public Apple iTunes Search API (which requires no authorization keys).
+              </p>
+              <p>
+                It matches the artist and track title against verified Apple Music catalogue records, injecting exact release years, primary genres (e.g. <em>Indie Rock, Synthwave, Classical</em>), track index, and disc numbers into the download payload.
+              </p>
+              <div class="hiw-features">
+                <div class="hiw-feat-pill">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Accurate Year &amp; Genre tagging</span>
+                </div>
+                <div class="hiw-feat-pill">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Free keyless iTunes Search API</span>
+                </div>
+                <div class="hiw-feat-pill">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Fallback defaults if offline</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="hiw-step-item">
+              <div class="hiw-step-header">
+                <div class="hiw-step-badge">
+                  <span class="hiw-step-num">3</span>
+                  <span>Intelligent Audio Match &amp; Acquisition</span>
+                </div>
+                <span class="hiw-step-tag">src/Downloader/AudioDownloader.php + yt-dlp</span>
+              </div>
+              <h4>Heuristic Search &amp; Studio Audio Stream Selection</h4>
+              <p>
+                With verified metadata in hand, Sounify Pi builds a targeted query: <code>ytsearch1:"Artist - Title (Official Audio)"</code>. Sounify Pi leverages the latest release of <code>yt-dlp</code> to locate the highest quality audio stream directly from YouTube Music or official artist topic channels.
+              </p>
+              <p>
+                The heuristic scoring prioritizes official studio tracks, filters out live performances, video intros, sketches, and 10-hour loops, and selects the pristine OPUS (251) or AAC (140) source stream before feeding it into FFmpeg.
+              </p>
+              <div class="hiw-features">
+                <div class="hiw-feat-pill">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Prefers Official Audio &amp; Topic streams</span>
+                </div>
+                <div class="hiw-feat-pill">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Avoids music video dialogue &amp; silence</span>
+                </div>
+                <div class="hiw-feat-pill">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>ARM64 and Windows native binary support</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="hiw-step-item">
+              <div class="hiw-step-header">
+                <div class="hiw-step-badge">
+                  <span class="hiw-step-num">4</span>
+                  <span>Audiophile Transcoding &amp; Tag Injection</span>
+                </div>
+                <span class="hiw-step-tag">FFmpeg + ID3v2.3 / Vorbis Tags</span>
+              </div>
+              <h4>Flawless Tagging &amp; Single Cover.jpg Standard</h4>
+              <p>
+                <code>ffmpeg</code> converts the raw audio stream to your requested output format (<strong>MP3 CBR 320k</strong>, <strong>FLAC Lossless 16/24-bit</strong>, <strong>M4A AAC</strong>, or <strong>OPUS</strong>).
+              </p>
+              <p>
+                Simultaneously, Sounify Pi injects standard ID3v2.3 metadata into MP3s or native Vorbis comments into FLAC/OPUS files. It writes the embedded cover image into the file headers and exports a clean <code>cover.jpg</code> alongside the tracks, complying with the universal <em>Single Cover.jpg Standard</em> expected by Navidrome, Plex, Jellyfin, and file managers.
+              </p>
+              <div class="hiw-features">
+                <div class="hiw-feat-pill">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>MP3 320k, FLAC, M4A &amp; OPUS</span>
+                </div>
+                <div class="hiw-feat-pill">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>ID3v2.3 &amp; Vorbis universal tags</span>
+                </div>
+                <div class="hiw-feat-pill">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Standardized Single cover.jpg</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="hiw-step-item">
+              <div class="hiw-step-header">
+                <div class="hiw-step-badge">
+                  <span class="hiw-step-num">5</span>
+                  <span>Instant Navidrome Subsonic Auto-Sync</span>
+                </div>
+                <span class="hiw-step-tag">src/Navidrome/NavidromeClient.php</span>
+              </div>
+              <h4>Real-time Library Availability Across All Devices</h4>
+              <p>
+                Rather than waiting for scheduled daily disk scans or manually navigating to Navidrome's admin panel, Sounify Pi automatically fires an authenticated Subsonic API call (<code>/rest/startScan.view</code>) as soon as the download finishes.
+              </p>
+              <p>
+                Navidrome immediately indexes the newly created album folder, rendering it playable on your phone (Symfonium, Substreamer, DSub, Tempo) and desktop streaming apps within seconds.
+              </p>
+              <div class="hiw-features">
+                <div class="hiw-feat-pill">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Instant Subsonic startScan dispatch</span>
+                </div>
+                <div class="hiw-feat-pill">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Auto-generates M3U8 playlists</span>
+                </div>
+                <div class="hiw-feat-pill">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Zero-delay mobile playback</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <h3>Architectural Comparison</h3>
+          <div class="table-wrap">
+            <table class="doc-table">
+              <thead>
+                <tr>
+                  <th>Method</th>
+                  <th>API Token Required</th>
+                  <th>RAM &amp; CPU Usage</th>
+                  <th>Risk of Suspension</th>
+                  <th>Navidrome Integration</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Official Spotify API</strong></td>
+                  <td>Yes (OAuth &amp; Client Secret)</td>
+                  <td>Low</td>
+                  <td>High (Strict ToS Rate Limits)</td>
+                  <td>Manual</td>
+                </tr>
+                <tr>
+                  <td><strong>Browser Puppeteer / Selenium</strong></td>
+                  <td>No (Browser Automation)</td>
+                  <td>Very High (500MB+ RAM)</td>
+                  <td>Medium (Cloudflare Bot Check)</td>
+                  <td>Manual</td>
+                </tr>
+                <tr>
+                  <td><strong>Sounify Pi Engine</strong></td>
+                  <td><span style="color: var(--accent); font-weight: 800;">Zero (Keyless Embeds)</span></td>
+                  <td><span style="color: var(--accent); font-weight: 800;">Ultra Low (~15MB RAM)</span></td>
+                  <td><span style="color: var(--accent); font-weight: 800;">None (Public Web Assets)</span></td>
+                  <td><span style="color: var(--accent); font-weight: 800;">Automatic Subsonic Sync</span></td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </section>
 
@@ -184,6 +666,154 @@
               <p>Notifies your local Navidrome server via Subsonic API <code>startScan.view</code> to make tracks playable on all your devices immediately.</p>
             </div>
           </div>
+        </section>
+
+        <!-- ONE-CLICK INSTALL SECTION -->
+        <section id="one-click">
+          <div class="doc-breadcrumb">
+            <span>Getting Started</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 6 6 6-6 6"></path></svg>
+            <span class="current">One-Click Install</span>
+          </div>
+
+          <h2>One-Click Install</h2>
+          <p>
+            Sounify Pi is available with zero-setup one-click installations for popular self-hosted home-server and SBC platforms. <strong>No manual command line required.</strong>
+          </p>
+
+          <h3>Supported platforms</h3>
+          <p>Choose your preferred self-hosted dashboard or operating system:</p>
+
+          <div class="platform-grid">
+            <a href="https://casaos.zimaspace.com/" target="_blank" rel="noreferrer" class="platform-card">
+              <div>
+                <div class="platform-card-header">
+                  <span class="platform-name">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+                    CasaOS
+                  </span>
+                  <span class="pipeline-badge" style="margin: 0;">1-Click</span>
+                </div>
+                <p class="platform-desc">Instant deployment on ZimaBoard, ZimaBlade, and standard Debian / Armbian setups.</p>
+              </div>
+              <span class="platform-link-label">
+                casaos.zimaspace.com
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+              </span>
+            </a>
+
+            <a href="https://apps.umbrel.com/" target="_blank" rel="noreferrer" class="platform-card">
+              <div>
+                <div class="platform-card-header">
+                  <span class="platform-name">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                    Umbrel
+                  </span>
+                  <span class="pipeline-badge" style="margin: 0;">App Store</span>
+                </div>
+                <p class="platform-desc">One-click app store install for Umbrel OS on Raspberry Pi, Orange Pi, and x86 servers.</p>
+              </div>
+              <span class="platform-link-label">
+                apps.umbrel.com
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+              </span>
+            </a>
+
+            <a href="https://www.homedock.cloud/" target="_blank" rel="noreferrer" class="platform-card">
+              <div>
+                <div class="platform-card-header">
+                  <span class="platform-name">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--accent)" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                    HomeDock OS
+                  </span>
+                  <span class="pipeline-badge" style="margin: 0;">Community</span>
+                </div>
+                <p class="platform-desc">Docker orchestration &amp; media server ecosystem integration with Navidrome.</p>
+              </div>
+              <span class="platform-link-label">
+                homedock.cloud
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+              </span>
+            </a>
+          </div>
+
+          <div class="table-wrap">
+            <table class="doc-table">
+              <thead>
+                <tr>
+                  <th>Platform</th>
+                  <th>App Store / Install Source</th>
+                  <th>Default Port</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>CasaOS</strong></td>
+                  <td><a href="https://casaos.zimaspace.com/" target="_blank" rel="noreferrer" class="doc-green-link">casaos.zimaspace.com</a></td>
+                  <td><code>8080</code></td>
+                </tr>
+                <tr>
+                  <td><strong>Umbrel</strong></td>
+                  <td><a href="https://apps.umbrel.com/" target="_blank" rel="noreferrer" class="doc-green-link">apps.umbrel.com/app/sounify-pi</a></td>
+                  <td><code>8080</code></td>
+                </tr>
+                <tr>
+                  <td><strong>HomeDock OS</strong></td>
+                  <td><a href="https://www.homedock.cloud/" target="_blank" rel="noreferrer" class="doc-green-link">homedock.cloud/apps/sounify-pi</a></td>
+                  <td><code>8080</code></td>
+                </tr>
+                <tr>
+                  <td><strong>Orange Pi &amp; Armbian</strong></td>
+                  <td>Automated 1-line native bash installer</td>
+                  <td><code>8080</code></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            Each platform handles the Docker container, volume mounts (persisting your <code>storage/downloads</code> music library and <code>sounify.db</code>), and restart policy automatically. After installation, open Sounify Pi directly from your platform dashboard:
+          </p>
+          <ul>
+            <li><strong>Web URL:</strong> <code>http://IP_DE_TU_SERVIDOR:8080</code></li>
+            <li><strong>Default Credentials:</strong> Username <code>admin</code> / Password <code>admin</code></li>
+          </ul>
+
+          <div class="callout">
+            <div class="callout-title">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              Fast 1-Line Terminal Install (Alternative)
+            </div>
+            <p>
+              If you are on an Orange Pi, Debian, or Ubuntu terminal and prefer a single command that configures dependencies, systemd, and starts Sounify Pi automatically:
+            </p>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span>Automated 1-Line Installer</span>
+              <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+            </div>
+            <pre><code>curl -sSL https://raw.githubusercontent.com/sixtomh/sounify-pi/main/install.sh | bash</code></pre>
+          </div>
+
+          <h3>Updating</h3>
+          <p>
+            Updates are managed directly through your platform's app store or via a single command:
+          </p>
+          <ul>
+            <li><strong>App Stores (CasaOS / Umbrel):</strong> Open the Sounify Pi card in your dashboard and click <strong>Update</strong> when a new release notification appears.</li>
+            <li><strong>Docker Compose:</strong> Run <code>docker compose pull &amp;&amp; docker compose up -d</code>.</li>
+            <li><strong>Native Installation:</strong> Run <code>git pull &amp;&amp; sudo systemctl restart sounify-pi</code>.</li>
+          </ul>
+          <p>
+            Your downloaded music files and settings in SQLite (<code>sounify.db</code>) are preserved automatically across all updates.
+          </p>
+
+          <h3>Custom configuration</h3>
+          <p>
+            Audio formats (MP3 320k, FLAC lossless, M4A, OPUS), custom download directories, and Navidrome synchronization can be configured through the web interface in the <strong>Settings</strong> tab, or by passing environment variables (e.g. <code>PORT=8080</code>, <code>TZ=UTC</code>) in your platform's container settings.
+          </p>
         </section>
 
         <!-- 3. QUICKSTART DOCKER -->
@@ -432,6 +1062,11 @@ sudo systemctl status sounify-pi</code></pre>
                   <td>Lists downloaded songs from disk and database.</td>
                 </tr>
                 <tr>
+                  <td><code>/api/library/delete</code></td>
+                  <td><span class="badge-method badge-post">POST</span></td>
+                  <td>Permanently deletes a track from disk &amp; database and triggers Navidrome rescan.</td>
+                </tr>
+                <tr>
                   <td><code>/api/stream?id=ID</code></td>
                   <td><span class="badge-method badge-get">GET</span></td>
                   <td>Streams audio preview with byte-range headers.</td>
@@ -482,6 +1117,158 @@ sudo chmod -R 775 storage/downloads/</code></pre>
           </div>
         </section>
 
+        <!-- 14. CHANGELOG SECTION -->
+        <section id="changelog">
+          <div class="doc-breadcrumb">
+            <span>Releases &amp; Updates</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 6 6 6-6 6"></path></svg>
+            <span class="current">Changelog</span>
+          </div>
+
+          <h2>Changelog</h2>
+          <p>
+            Stay up to date with the latest features, enhancements, and security fixes in Sounify Pi.
+          </p>
+
+          <div class="changelog-timeline">
+            
+            <!-- v1.2.0 -->
+            <div class="changelog-release">
+              <div class="changelog-dot"></div>
+              <div class="changelog-header">
+                <span class="changelog-version">v1.2.0</span>
+                <span class="changelog-tag tag-latest">Latest</span>
+                <span class="changelog-date">November 2026</span>
+              </div>
+              <div class="changelog-card">
+                <h4><span class="badge-pill pill-feat">FEATURE</span> Spotify-Style Music Library &amp; Floating Player</h4>
+                <ul>
+                  <li>Redesigned <strong>Music Library</strong> with dedicated <strong>ALBUMS</strong> Grid View and <strong>TRACKS</strong> Table View.</li>
+                  <li>Clicking album cards starts playback immediately right in Grid View without unwanted view switches.</li>
+                  <li>Added persistent bottom <strong>Floating Island Audio Player</strong> with seekable scrubber, volume slider, track title, cover thumbnail, shuffle, repeat, and favorites.</li>
+                </ul>
+
+                <h4><span class="badge-pill pill-feat">FEATURE</span> Real-Time Search &amp; Rounded Toolbar</h4>
+                <ul>
+                  <li>Replaced filter input with a modern, fully rounded pill search box (`9999px`) featuring instant live filtering across tracks, albums, artists, and genres.</li>
+                  <li>Added a one-click clear button <code>(X)</code> to quickly reset searches.</li>
+                  <li>Styled the <strong>Recently added</strong> dropdown into a cohesive rounded control with high-contrast options.</li>
+                  <li>Added 360° spin feedback to the <strong>Refresh</strong> button with zero-cache server synchronization.</li>
+                </ul>
+
+                <h4><span class="badge-pill pill-feat">FEATURE</span> Official Vector SVG Branding</h4>
+                <ul>
+                  <li>Upgraded all application logos and favicons from PNG to crisp, scalable SVG vector graphics (<code>logo.svg</code>, <code>favicon.svg</code>).</li>
+                  <li>Enhanced header layout with comfortable spacing between the official emblem and <em>Sounify Pi</em> title.</li>
+                </ul>
+
+                <h4><span class="badge-pill pill-feat">FEATURE</span> Embedded Cover Artwork Extraction &amp; Caching</h4>
+                <ul>
+                  <li>Automatic extraction of embedded album artwork from audio files via FFmpeg on demand.</li>
+                  <li>Instant caching into <code>storage/covers/&lt;id&gt;.jpg</code> upon download completion with multi-tier Spotify fallbacks.</li>
+                </ul>
+
+                <h4><span class="badge-pill pill-feat">FEATURE</span> Library Track Deletion &amp; High-Contrast Polish</h4>
+                <ul>
+                  <li>Added an instant <strong>Delete Track</strong> action button with dedicated high-contrast colors in Dark Mode (red-400) and Light Mode (red-600).</li>
+                  <li>High-contrast Play/Pause icons in track rows and floating player bar.</li>
+                  <li>Permanently removes audio files from disk, cleans SQLite history and jobs, and prunes empty album folders.</li>
+                </ul>
+
+                <h4><span class="badge-pill pill-feat">FEATURE</span> One-Click Installation Documentation</h4>
+                <ul>
+                  <li>Added complete One-Click documentation matching modern self-hosted dashboard catalogs (CasaOS, Umbrel, HomeDock OS).</li>
+                  <li>Added 1-line automated bash installer script support for Orange Pi / Debian / Ubuntu.</li>
+                </ul>
+
+                <h4><span class="badge-pill pill-fix">BUG FIX</span> Windows &amp; Filesystem Compatibility</h4>
+                <ul>
+                  <li>Fixed <code>yt-dlp</code> template escaping on Windows: prevented PHP's <code>escapeshellarg()</code> from converting <code>%(ext)s</code> into a blank space.</li>
+                  <li>Added canonical 301 redirection for static documentation directories (<code>/docs</code> &rarr; <code>/docs/</code>).</li>
+                  <li>Sanitized folder and file names against trailing dots (<code>.</code>) and spaces that fail on Windows filesystems.</li>
+                  <li>Protected <code>.gitkeep</code> files during database storage purge operations.</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- v1.1.0 -->
+            <div class="changelog-release">
+              <div class="changelog-dot"></div>
+              <div class="changelog-header">
+                <span class="changelog-version">v1.1.0</span>
+                <span class="changelog-tag tag-release">Release</span>
+                <span class="changelog-date">October 2026</span>
+              </div>
+              <div class="changelog-card">
+                <h4><span class="badge-pill pill-sec">SECURITY</span> LAN &amp; Wi-Fi Access Control Layer</h4>
+                <ul>
+                  <li>Added mandatory authentication layer (<code>login.php</code> / <code>logout.php</code>) backed by <code>sounify.db</code> to safeguard instances on local Wi-Fi networks.</li>
+                  <li>Default credentials: <code>admin</code> / <code>admin</code> with in-app password and username change interface in <strong>Settings</strong>.</li>
+                  <li>Session cookies secured with <code>HttpOnly</code> and <code>SameSite=Lax</code> policies.</li>
+                </ul>
+
+                <h4><span class="badge-pill pill-feat">FEATURE</span> 20-Second Audio Preview Player</h4>
+                <ul>
+                  <li>Added instant 20-second audio preview in the <strong>Library</strong> view with HTTP 206 byte-range streaming.</li>
+                  <li>Interactive bottom player bar with live progress fill, current playback timer, and play/pause state synchronization.</li>
+                </ul>
+
+                <h4><span class="badge-pill pill-feat">FEATURE</span> Dark &amp; Light Mode Theme Switcher</h4>
+                <ul>
+                  <li>Introduced full Spotify-inspired Dark and Light themes with persistent <code>localStorage</code> preference.</li>
+                </ul>
+
+                <h4><span class="badge-pill pill-perf">MAINTENANCE</span> Database &amp; Storage Cleaner</h4>
+                <ul>
+                  <li>Added dedicated maintenance panel to wipe SQLite history/jobs with the option to keep or delete physical audio files.</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- v1.0.0 -->
+            <div class="changelog-release">
+              <div class="changelog-dot"></div>
+              <div class="changelog-header">
+                <span class="changelog-version">v1.0.0</span>
+                <span class="changelog-tag tag-release">Initial Release</span>
+                <span class="changelog-date">October 2026</span>
+              </div>
+              <div class="changelog-card">
+                <h4><span class="badge-pill pill-feat">INITIAL RELEASE</span> Sounify Pi Core Engine</h4>
+                <ul>
+                  <li>Direct extraction of public Spotify metadata (tracks, albums, playlists) via <code>open.spotify.com/embed</code> (no Spotify API keys or developer accounts required).</li>
+                  <li>Intelligent audio matcher querying YouTube Music / YouTube with duration delta scoring and remix exclusion filters.</li>
+                  <li>Automated transcoding via <code>yt-dlp</code> + <code>ffmpeg</code> (MP3 up to 320 kbps, FLAC lossless, M4A, OPUS).</li>
+                  <li>Keyless metadata enrichment: automated Release Year and Genre detection using the iTunes Search API.</li>
+                  <li>Embedded ID3v2.3 tags with album artwork and clean single <code>cover.jpg</code> file per album folder.</li>
+                  <li>Native Navidrome integration: automatic Subsonic API rescan triggers (<code>startScan.view</code>) on job completion.</li>
+                  <li>Automated relative <code>.m3u</code> playlist generation in <code>Playlists/</code>.</li>
+                  <li>Lightweight footprint (&lt; 60 MB RAM) optimized for Orange Pi single-board computers.</li>
+                </ul>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- Previous / Next Navigation Cards (Downtify Standard) -->
+        <div class="docs-nav-cards">
+          <a href="#troubleshooting" class="nav-card">
+            <span class="nav-card-label">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5m0 0 6-6m-6 6 6 6"></path></svg>
+              Previous
+            </span>
+            <span class="nav-card-title">Troubleshooting &amp; Tips</span>
+          </a>
+          <a href="#overview" class="nav-card next">
+            <span class="nav-card-label">
+              Next
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14m-7-7l7 7l-7 7"></path></svg>
+            </span>
+            <span class="nav-card-title">Back to Top (Overview)</span>
+          </a>
+        </div>
+
         <!-- Footer -->
         <footer class="docs-footer">
           <div>
@@ -494,26 +1281,6 @@ sudo chmod -R 775 storage/downloads/</code></pre>
 
       </article>
     </main>
-
-    <!-- Right Table of Contents (On this page) -->
-    <aside class="docs-toc">
-      <div class="toc-title">On this page</div>
-      <ul class="toc-list">
-        <li><a href="#overview" class="toc-link">Overview &amp; Concept</a></li>
-        <li><a href="#pipeline" class="toc-link">4-Step Audio Pipeline</a></li>
-        <li><a href="#quickstart" class="toc-link">Quickstart (Docker)</a></li>
-        <li><a href="#orangepi" class="toc-link">Orange Pi Native</a></li>
-        <li><a href="#systemd" class="toc-link">Systemd Service</a></li>
-        <li><a href="#naming" class="toc-link">File Naming Schemes</a></li>
-        <li><a href="#metadata" class="toc-link">Year, Genre &amp; Tags</a></li>
-        <li><a href="#covers" class="toc-link">Single cover.jpg</a></li>
-        <li><a href="#preview" class="toc-link">20-Second Preview</a></li>
-        <li><a href="#quality" class="toc-link">Audio Formats</a></li>
-        <li><a href="#navidrome" class="toc-link">Navidrome Sync</a></li>
-        <li><a href="#api" class="toc-link">REST API Endpoints</a></li>
-        <li><a href="#troubleshooting" class="toc-link">Troubleshooting</a></li>
-      </ul>
-    </aside>
 
   </div>
 
