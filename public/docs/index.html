@@ -204,7 +204,7 @@
                 <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
                 <span>Changelog</span>
               </div>
-              <span style="font-size: 0.65rem; background: var(--accent); color: #000; padding: 1px 6px; border-radius: 99px; font-weight: 800;">v1.3.0</span>
+              <span style="font-size: 0.65rem; background: var(--accent); color: #000; padding: 1px 6px; border-radius: 99px; font-weight: 800;">v1.3.1</span>
             </a>
           </li>
         </ul>
@@ -245,7 +245,7 @@
               </a>
             </div>
             <div class="badge-row">
-              <span class="meta-badge highlight">v1.3.0 Latest</span>
+              <span class="meta-badge highlight">v1.3.1 Latest</span>
               <span class="meta-badge">Orange Pi &amp; ARM64</span>
               <span class="meta-badge">Zero API Keys</span>
               <span class="meta-badge">Navidrome Subsonic Auto-Sync</span>
@@ -1132,12 +1132,45 @@ sudo chmod -R 775 storage/downloads/</code></pre>
 
           <div class="changelog-timeline">
             
+            <!-- v1.3.1 -->
+            <div class="changelog-release">
+              <div class="changelog-dot"></div>
+              <div class="changelog-header">
+                <span class="changelog-version">v1.3.1</span>
+                <span class="changelog-tag tag-latest">Latest</span>
+                <span class="changelog-date">November 2026</span>
+              </div>
+              <div class="changelog-card">
+                <h4><span class="badge-pill pill-fix">FIX</span> Responsive Mobile Player Collision &amp; Navigation Stacking</h4>
+                <ul>
+                  <li>Fixed critical mobile layout overlap where the fixed bottom navigation bar (<code>.nav-tabs</code>) covered the floating persistent playback controller (<code>.spotify-player-bar</code>).</li>
+                  <li>Dynamically repositioned the player bar on mobile devices (<code>bottom: calc(56px + max(8px, env(safe-area-inset-bottom)) + 0.4rem)</code>) and elevated bulk action bars and toasts with proper z-indexing.</li>
+                  <li>Optimized responsive track tables: automatically hides secondary columns (Added date, Release date, Album, Format) on screens under <code>860px</code> and <code>580px</code> to eliminate horizontal page blowout.</li>
+                  <li>Enhanced responsive library cards: switched to a neat 2-column grid layout on mobile screens under <code>580px</code>.</li>
+                </ul>
+
+                <h4><span class="badge-pill pill-fix">FIX</span> Light Mode WCAG Contrast &amp; Theming Audit</h4>
+                <ul>
+                  <li>Resolved low contrast and invisible text issues across Light Mode: corrected muted text, settings sidebar descriptions, bulk selection counters, and clipboard preview pills.</li>
+                  <li>Fixed translucent dark modal backdrops, dialog surface colors, table borders, and custom checkbox checkmarks in light theme.</li>
+                  <li>Styled native <code>select.form-control option</code> elements to ensure dropdown item backgrounds always match the active surface color regardless of OS dark/light mode preference.</li>
+                </ul>
+
+                <h4><span class="badge-pill pill-feat">FEATURE</span> Keyboard Shortcuts Modal &amp; Hotkey Guarding</h4>
+                <ul>
+                  <li>Implemented the complete <strong>Keyboard Shortcuts</strong> modal (accessible via footer link or pressing <kbd>?</kbd> anywhere in the app).</li>
+                  <li>Added numerical hotkeys <kbd>1</kbd>&ndash;<kbd>5</kbd> for rapid switching between Home, Search, Downloads, Library, and Settings.</li>
+                  <li>Added global modal guarding in keyboard event listeners to prevent playback, search, or tab switching hotkeys from unintentionally firing while typing in edit dialogs or metadata inputs.</li>
+                </ul>
+              </div>
+            </div>
+
             <!-- v1.3.0 -->
             <div class="changelog-release">
               <div class="changelog-dot"></div>
               <div class="changelog-header">
                 <span class="changelog-version">v1.3.0</span>
-                <span class="changelog-tag tag-latest">Latest</span>
+                <span class="changelog-tag">Release</span>
                 <span class="changelog-date">November 2026</span>
               </div>
               <div class="changelog-card">

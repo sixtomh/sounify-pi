@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/style.css?v=1.2.8">
+  <link rel="stylesheet" href="/style.css?v=1.3.1">
 </head>
 <body>
   <div class="app-container">
@@ -742,15 +742,15 @@
                 </div>
 
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
-                  <div style="background: rgba(255, 255, 255, 0.03); padding: 0.85rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+                  <div class="settings-info-card">
                     <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Target Architecture</div>
                     <div style="font-size: 0.95rem; font-weight: 700; color: var(--text-main); margin-top: 0.25rem;">Linux ARM64 / Orange Pi</div>
                   </div>
-                  <div style="background: rgba(255, 255, 255, 0.03); padding: 0.85rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+                  <div class="settings-info-card">
                     <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Storage Partition</div>
                     <div style="font-size: 0.95rem; font-weight: 700; color: var(--text-main); margin-top: 0.25rem;">Auto-detected mount</div>
                   </div>
-                  <div style="background: rgba(255, 255, 255, 0.03); padding: 0.85rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+                  <div class="settings-info-card">
                     <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Download Engine</div>
                     <div style="font-size: 0.95rem; font-weight: 700; color: var(--accent-primary); margin-top: 0.25rem;">yt-dlp + FFmpeg</div>
                   </div>
@@ -765,7 +765,7 @@
                   <h2 class="settings-pane-title">System &amp; App Version</h2>
                   <p class="settings-pane-subtitle">Environment, dependencies and system runtime specifications</p>
                 </div>
-                <span style="font-size: 0.78rem; background: var(--accent-primary); color: #000; padding: 4px 10px; border-radius: 999px; font-weight: 800;">v1.3.0</span>
+                <span style="font-size: 0.78rem; background: var(--accent-primary); color: #000; padding: 4px 10px; border-radius: 999px; font-weight: 800;">v1.3.1</span>
               </div>
 
               <div class="glass-panel settings-card">
@@ -780,19 +780,19 @@
                 </div>
 
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
-                  <div style="background: rgba(255, 255, 255, 0.03); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+                  <div class="settings-info-card">
                     <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Runtime</div>
                     <div style="font-size: 1rem; font-weight: 700; color: var(--text-main); margin-top: 0.35rem; font-family: 'JetBrains Mono', monospace;">PHP 8.3 CLI / FPM</div>
                   </div>
-                  <div style="background: rgba(255, 255, 255, 0.03); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+                  <div class="settings-info-card">
                     <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Database</div>
                     <div style="font-size: 1rem; font-weight: 700; color: var(--text-main); margin-top: 0.35rem; font-family: 'JetBrains Mono', monospace;">SQLite 3 (WAL mode)</div>
                   </div>
-                  <div style="background: rgba(255, 255, 255, 0.03); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+                  <div class="settings-info-card">
                     <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Integration</div>
                     <div style="font-size: 1rem; font-weight: 700; color: var(--text-main); margin-top: 0.35rem; font-family: 'JetBrains Mono', monospace;">Subsonic REST API</div>
                   </div>
-                  <div style="background: rgba(255, 255, 255, 0.03); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+                  <div class="settings-info-card">
                     <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">License / Deployment</div>
                     <div style="font-size: 1rem; font-weight: 700; color: var(--accent-primary); margin-top: 0.35rem;">Self-hosted / Open Source</div>
                   </div>
@@ -808,7 +808,7 @@
 
     <!-- Footer -->
     <footer class="app-footer">
-      <p>&copy; 2026 Sounify Pi · Self-hosted on Orange Pi · Integrated with Navidrome Subsonic API · <a href="/docs/" target="_blank" style="color: var(--accent-primary); text-decoration: underline;">View Documentation &amp; Setup Guide</a></p>
+      <p>&copy; 2026 Sounify Pi · Self-hosted on Orange Pi · Integrated with Navidrome Subsonic API · <a href="/docs/" target="_blank" style="color: var(--accent-primary); text-decoration: underline;">View Documentation &amp; Setup Guide</a> · <a href="#" id="btn-footer-shortcuts" style="color: var(--text-muted); text-decoration: underline;">Shortcuts (?)</a></p>
     </footer>
   </div>
 
@@ -1020,9 +1020,66 @@
     </div>
   </div>
 
+  <!-- Keyboard Shortcuts Modal -->
+  <div id="modal-shortcuts" class="sp-modal-backdrop" style="display: none;">
+    <div class="sp-modal-content" style="max-width: 480px;">
+      <div class="sp-modal-header">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <div class="sp-modal-icon">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="M6 8h.001M10 8h.001M14 8h.001M18 8h.001M8 12h.001M12 12h.001M16 12h.001M7 16h10"></path></svg>
+          </div>
+          <div>
+            <h3 class="sp-modal-title">Keyboard Shortcuts</h3>
+            <p class="sp-modal-subtitle">Quick controls for power users</p>
+          </div>
+        </div>
+        <button type="button" class="sp-modal-close" id="btn-close-shortcuts-modal" title="Close (Esc)">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <div class="sp-modal-body" style="padding: 1.25rem 1.5rem;">
+        <div class="shortcuts-grid">
+          <div class="shortcut-row">
+            <span class="shortcut-desc">Focus Search</span>
+            <div class="shortcut-keys"><kbd>/</kbd> <span class="shortcut-or">or</span> <kbd>Ctrl+K</kbd></div>
+          </div>
+          <div class="shortcut-row">
+            <span class="shortcut-desc">Play / Pause</span>
+            <div class="shortcut-keys"><kbd>Space</kbd></div>
+          </div>
+          <div class="shortcut-row">
+            <span class="shortcut-desc">Seek ±5 seconds</span>
+            <div class="shortcut-keys"><kbd>&larr;</kbd> <kbd>&rarr;</kbd></div>
+          </div>
+          <div class="shortcut-row">
+            <span class="shortcut-desc">Volume ±5%</span>
+            <div class="shortcut-keys"><kbd>&uarr;</kbd> <kbd>&darr;</kbd></div>
+          </div>
+          <div class="shortcut-row">
+            <span class="shortcut-desc">Mute / Unmute</span>
+            <div class="shortcut-keys"><kbd>M</kbd></div>
+          </div>
+          <div class="shortcut-row">
+            <span class="shortcut-desc">Close Modals / Deselect</span>
+            <div class="shortcut-keys"><kbd>Esc</kbd></div>
+          </div>
+          <div class="shortcut-row">
+            <span class="shortcut-desc">Switch Tabs (Home, Search, Downloads, Library, Settings)</span>
+            <div class="shortcut-keys"><kbd>1</kbd> - <kbd>5</kbd></div>
+          </div>
+          <div class="shortcut-row">
+            <span class="shortcut-desc">Toggle Shortcuts Help</span>
+            <div class="shortcut-keys"><kbd>?</kbd></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Floating Toast Notifications Container -->
   <div id="sp-toast-container" class="sp-toast-container" aria-live="polite"></div>
 
-  <script src="/app.js?v=1.2.9"></script>
+  <script src="/app.js?v=1.3.1"></script>
 </body>
 </html>

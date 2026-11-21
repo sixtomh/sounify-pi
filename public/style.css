@@ -4205,3 +4205,357 @@ tr.spotify-track-row.is-playing .sp-row-play-btn {
     display: none;
   }
 }
+
+/* ==========================================================================
+   Shortcuts Modal & Keyboard Badges
+   ========================================================================== */
+.shortcuts-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.shortcut-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.45rem 0;
+  border-bottom: 1px solid var(--border-color);
+  gap: 1rem;
+}
+
+.shortcut-row:last-child {
+  border-bottom: none;
+}
+
+.shortcut-desc {
+  font-size: 0.88rem;
+  color: var(--text-main);
+  font-weight: 500;
+}
+
+.shortcut-keys {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
+.shortcut-or {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+}
+
+kbd {
+  display: inline-block;
+  padding: 2px 7px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.76rem;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 5px;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="light"] kbd {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #0f172a;
+  box-shadow: 0 2px 0 #cbd5e1;
+}
+
+/* ==========================================================================
+   Settings Info Cards (Telemetry & App Info)
+   ========================================================================== */
+.settings-info-card {
+  background: rgba(255, 255, 255, 0.03);
+  padding: 1rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  transition: var(--transition);
+}
+
+[data-theme="light"] .settings-info-card {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+select.form-control option {
+  background: var(--bg-surface);
+  color: var(--text-main);
+}
+
+/* ==========================================================================
+   Comprehensive Light Theme Contrast Polish
+   ========================================================================== */
+[data-theme="light"] .settings-sidebar {
+  background: #ffffff;
+  border-color: #e2e8f0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .settings-nav-item {
+  color: #475569;
+}
+
+[data-theme="light"] .settings-nav-item:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+  border-color: #e2e8f0;
+}
+
+[data-theme="light"] .settings-nav-item.active {
+  background: rgba(30, 215, 96, 0.14);
+  color: #15803d;
+  border-color: rgba(30, 215, 96, 0.4);
+  box-shadow: 0 2px 10px rgba(30, 215, 96, 0.1);
+}
+
+[data-theme="light"] .settings-nav-item.active .settings-nav-desc {
+  color: #166534;
+}
+
+[data-theme="light"] .settings-nav-item.active .settings-nav-icon {
+  color: #15803d;
+}
+
+[data-theme="light"] .sp-modal-backdrop {
+  background: rgba(15, 23, 42, 0.55);
+}
+
+[data-theme="light"] .sp-modal-content {
+  background: #ffffff;
+  border-color: #e2e8f0;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.18);
+}
+
+[data-theme="light"] .sp-modal-header {
+  border-bottom-color: #e2e8f0;
+}
+
+[data-theme="light"] .sp-modal-footer {
+  border-top-color: #e2e8f0;
+}
+
+[data-theme="light"] .sp-modal-close:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+[data-theme="light"] .clipboard-suggest-pill {
+  background: rgba(30, 215, 96, 0.15);
+  border-color: rgba(30, 215, 96, 0.5);
+  color: #0f172a;
+}
+
+[data-theme="light"] .clipboard-suggest-pill strong {
+  color: #15803d;
+}
+
+[data-theme="light"] .btn-pill-dismiss {
+  color: #64748b;
+}
+
+[data-theme="light"] .btn-pill-dismiss:hover {
+  color: #0f172a;
+}
+
+[data-theme="light"] .sp-bulk-bar {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+}
+
+[data-theme="light"] .sp-bulk-info {
+  color: #0f172a;
+  border-right-color: #e2e8f0;
+}
+
+[data-theme="light"] .btn-bulk-action {
+  background: #f1f5f9;
+  color: #0f172a;
+  border: 1px solid #e2e8f0;
+}
+
+[data-theme="light"] .btn-bulk-action:hover {
+  background: #e2e8f0;
+}
+
+[data-theme="light"] .btn-bulk-danger {
+  color: #dc2626;
+  background: #fee2e2;
+  border-color: #fecaca;
+}
+
+[data-theme="light"] .btn-bulk-danger:hover {
+  background: #fca5a5;
+}
+
+[data-theme="light"] .btn-bulk-close {
+  color: #64748b;
+}
+
+[data-theme="light"] .btn-bulk-close:hover {
+  color: #0f172a;
+}
+
+[data-theme="light"] .sp-toast {
+  background: #ffffff;
+  color: #0f172a;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+}
+
+[data-theme="light"] .sp-toast-success {
+  border-left: 4px solid var(--accent-primary);
+}
+
+[data-theme="light"] .sp-toast-error {
+  border-left: 4px solid #ef4444;
+}
+
+[data-theme="light"] .sp-toast-info {
+  border-left: 4px solid #3b82f6;
+}
+
+[data-theme="light"] .sp-checkbox {
+  background: #ffffff;
+  border-color: #cbd5e1;
+}
+
+[data-theme="light"] .sp-checkbox:checked {
+  background-color: var(--accent-primary);
+  border-color: var(--accent-primary);
+}
+
+[data-theme="light"] .skeleton-box {
+  background: linear-gradient(90deg, #e2e8f0 25%, #f8fafc 50%, #e2e8f0 75%);
+  background-size: 200% 100%;
+}
+
+[data-theme="light"] .skeleton-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+}
+
+[data-theme="light"] .spotify-track-table th {
+  border-bottom-color: #e2e8f0;
+}
+
+[data-theme="light"] .spotify-track-table td {
+  border-bottom: 1px solid #f1f5f9;
+}
+
+[data-theme="light"] tr.spotify-track-row:hover {
+  background: #f8fafc;
+}
+
+[data-theme="light"] tr.spotify-track-row.is-active {
+  background: #f1f5f9;
+}
+
+[data-theme="light"] .sp-format-tag {
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+  color: #475569;
+}
+
+[data-theme="light"] .album-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+}
+
+[data-theme="light"] .album-card:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+[data-theme="light"] .lib-subtab-badge {
+  background: rgba(0, 0, 0, 0.08);
+  color: #09090b;
+}
+
+[data-theme="light"] .lib-subtab.active .lib-subtab-badge {
+  background: var(--accent-primary);
+  color: #000000;
+}
+
+/* ==========================================================================
+   Responsive Polish (Mobile Navigation & Table Overlaps)
+   ========================================================================== */
+@media (max-width: 860px) {
+  .spotify-track-table th:nth-child(6),
+  .spotify-track-table td:nth-child(6),
+  .spotify-track-table th:nth-child(7),
+  .spotify-track-table td:nth-child(7) {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Avoid player bar colliding with fixed bottom nav-tabs */
+  .spotify-player-bar {
+    bottom: calc(56px + max(8px, env(safe-area-inset-bottom)) + 0.4rem) !important;
+    width: calc(100% - 1rem) !important;
+    height: 68px !important;
+    border-radius: 12px !important;
+  }
+
+  .sp-player-content {
+    padding: 0 0.85rem !important;
+    gap: 0.75rem !important;
+  }
+
+  body.has-active-player .app-container {
+    padding-bottom: calc(140px + env(safe-area-inset-bottom)) !important;
+  }
+
+  .sp-toast-container {
+    bottom: calc(65px + max(8px, env(safe-area-inset-bottom))) !important;
+    right: 12px !important;
+    left: 12px !important;
+  }
+
+  body.has-active-player .sp-toast-container {
+    bottom: calc(135px + max(8px, env(safe-area-inset-bottom))) !important;
+  }
+
+  .sp-bulk-bar {
+    bottom: calc(65px + max(8px, env(safe-area-inset-bottom))) !important;
+    width: calc(100% - 1.5rem) !important;
+    justify-content: space-between !important;
+    padding: 6px 12px !important;
+  }
+
+  body.has-active-player .sp-bulk-bar {
+    bottom: calc(135px + max(8px, env(safe-area-inset-bottom))) !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .library-title {
+    font-size: 1.75rem !important;
+  }
+
+  .library-header-row {
+    align-items: center !important;
+    gap: 0.75rem !important;
+  }
+}
+
+@media (max-width: 580px) {
+  .spotify-track-table th:nth-child(4),
+  .spotify-track-table td:nth-child(4),
+  .spotify-track-table th:nth-child(5),
+  .spotify-track-table td:nth-child(5) {
+    display: none;
+  }
+
+  .library-grid-cards {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.85rem !important;
+  }
+}

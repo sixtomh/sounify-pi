@@ -1336,6 +1336,40 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('scroll', hideContextMenu, { passive: true });
   window.addEventListener('resize', hideContextMenu);
 
+  // Shortcuts Modal Elements
+  const modalShortcuts = document.getElementById('modal-shortcuts');
+  const btnCloseShortcutsModal = document.getElementById('btn-close-shortcuts-modal');
+  const btnFooterShortcuts = document.getElementById('btn-footer-shortcuts');
+
+  function openShortcutsModal() {
+    if (!modalShortcuts) return;
+    modalShortcuts.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeShortcutsModal() {
+    if (!modalShortcuts) return;
+    modalShortcuts.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+
+  function toggleShortcutsModal() {
+    if (modalShortcuts && modalShortcuts.style.display === 'flex') {
+      closeShortcutsModal();
+    } else {
+      openShortcutsModal();
+    }
+  }
+
+  btnCloseShortcutsModal?.addEventListener('click', closeShortcutsModal);
+  modalShortcuts?.addEventListener('click', (e) => {
+    if (e.target === modalShortcuts) closeShortcutsModal();
+  });
+  btnFooterShortcuts?.addEventListener('click', (e) => {
+    e.preventDefault();
+    openShortcutsModal();
+  });
+
   // Global Keyboard Shortcuts (Power User)
   document.addEventListener('keydown', (e) => {
     // 1. Always handle Escape to dismiss modals and menus
@@ -1343,6 +1377,17 @@ document.addEventListener('DOMContentLoaded', () => {
       hideContextMenu();
       closeEditModal();
       closeBulkEditModal();
+      closeShortcutsModal();
+      return;
+    }
+
+    // Check if any modal is currently visible
+    const isAnyModalOpen = (modalEditMetadata && modalEditMetadata.style.display === 'flex') ||
+      (modalBulkEdit && modalBulkEdit.style.display === 'flex') ||
+      (modalShortcuts && modalShortcuts.style.display === 'flex');
+
+    if (isAnyModalOpen) {
+      // If modal is open, only allow typing inside inputs and Escape
       return;
     }
 
@@ -1415,6 +1460,21 @@ document.addEventListener('DOMContentLoaded', () => {
         if (spPlayerVolumeFill) spPlayerVolumeFill.style.width = `${restored * 100}%`;
         showToast('Unmuted', 'info', 1500);
       }
+      return;
+    }
+
+    // 8. Number keys 1-5 to switch tabs: 1=home, 2=search, 3=downloads, 4=library, 5=settings
+    if (['1', '2', '3', '4', '5'].includes(e.key) && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      e.preventDefault();
+      const tabMap = { '1': 'home', '2': 'search', '3': 'downloads', '4': 'library', '5': 'settings' };
+      switchTab(tabMap[e.key]);
+      return;
+    }
+
+    // 9. Shortcuts modal toggle: "?"
+    if (e.key === '?') {
+      e.preventDefault();
+      toggleShortcutsModal();
       return;
     }
   });
