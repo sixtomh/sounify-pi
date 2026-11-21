@@ -489,6 +489,51 @@ class App
                 $filePath = (string)($track['file_path'] ?? '');
                 $fileTagged = false;
                 if ($filePath !== '' && file_exists($filePath) && is_file($filePath)) {
+                    // Si el álbum cambió, verificar si el archivo debe reubicarse en la misma carpeta física del álbum
+                    if ($album !== '') {
+                        try {
+                            $targetDir = null;
+                            $siblingStmt = $pdo->prepare("SELECT file_path FROM history WHERE album = :album AND id != :id AND file_path != '' LIMIT 1");
+                            $siblingStmt->execute([':album' => $album, ':id' => $id]);
+                            $sibling = $siblingStmt->fetch();
+
+                            if ($sibling && !empty($sibling['file_path']) && file_exists(dirname($sibling['file_path']))) {
+                                $targetDir = dirname($sibling['file_path']);
+                            } elseif (Config::getBool('organize_by_album', true)) {
+                                $baseDir = Config::getDownloadDir();
+                                $safeArtist = preg_replace('/[\\\\\/:\*\?"<>\|]/', '_', $artist ?: ($track['artist'] ?? 'Unknown Artist'));
+                                $safeAlbum = preg_replace('/[\\\\\/:\*\?"<>\|]/', '_', $album);
+                                if (Config::getBool('organize_by_artist', true)) {
+                                    $targetDir = rtrim($baseDir, '/\\') . '/' . $safeArtist . '/' . $safeAlbum;
+                                } else {
+                                    $targetDir = rtrim($baseDir, '/\\') . '/' . $safeAlbum;
+                                }
+                            }
+
+                            if ($targetDir && is_string($targetDir)) {
+                                if (!is_dir($targetDir)) {
+                                    @mkdir($targetDir, 0755, true);
+                                }
+                                $destPath = rtrim($targetDir, '/\\') . '/' . basename($filePath);
+                                if (realpath($destPath) !== realpath($filePath) && !file_exists($destPath)) {
+                                    if (@rename($filePath, $destPath)) {
+                                        $oldDir = dirname($filePath);
+                                        $filePath = $destPath;
+                                        // Actualizar ruta en base de datos
+                                        $pdo->prepare("UPDATE history SET file_path = :fp WHERE id = :id")->execute([':fp' => $filePath, ':id' => $id]);
+                                        // Limpiar carpeta anterior si quedó vacía
+                                        if (is_dir($oldDir)) {
+                                            $remaining = @scandir($oldDir);
+                                            if (is_array($remaining) && count(array_diff($remaining, ['.', '..'])) === 0) {
+                                                @rmdir($oldDir);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        } catch (\Throwable) {}
+                    }
+
                     try {
                         $tagger = new \Sounify\Tagging\Id3Writer();
                         $tagger->tagAudio($filePath, [
@@ -1016,7 +1061,8 @@ class App
                     Config::get('navidrome_user', ''),
                     Config::get('navidrome_pass', '')
                 );
-                $res = $client->startScan();
+                $fullScan = !empty($input['full_scan']) || !empty($_POST['full_scan']) || !empty($_GET['full_scan']);
+                $res = $client->startScan($fullScan);
                 echo json_encode($res);
                 return;
 

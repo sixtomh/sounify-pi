@@ -80,7 +80,19 @@ class Id3Writer
         if ($album !== '') {
             $cmd[] = '-metadata';
             $cmd[] = "album={$album}";
+            $cmd[] = '-metadata';
+            $cmd[] = "ALBUM={$album}";
         }
+
+        // Limpiar MusicBrainz IDs que a menudo dividen canciones sueltas de sus álbumes en Navidrome
+        $cmd[] = '-metadata';
+        $cmd[] = 'musicbrainz_albumid=';
+        $cmd[] = '-metadata';
+        $cmd[] = 'MUSICBRAINZ_ALBUMID=';
+        $cmd[] = '-metadata';
+        $cmd[] = 'musicbrainz_releasegroupid=';
+        $cmd[] = '-metadata';
+        $cmd[] = 'musicbrainz_trackid=';
         if ($year !== '') {
             $cmd[] = '-metadata';
             $cmd[] = "date={$year}";

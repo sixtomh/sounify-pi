@@ -54,18 +54,19 @@ class NavidromeClient
     }
 
     /**
-     * Trigger a library scan on Navidrome
+     * Trigger a library scan on Navidrome (supports incremental or fullScan)
      */
-    public function startScan(): array
+    public function startScan(bool $fullScan = false): array
     {
         try {
-            $resp = $this->request('startScan.view');
+            $extraParams = $fullScan ? ['fullScan' => 'true'] : [];
+            $resp = $this->request('startScan.view', $extraParams);
             $status = $resp['subsonic-response']['status'] ?? '';
 
             if ($status === 'ok') {
                 return [
                     'success' => true,
-                    'message' => 'Library scan initiated on Navidrome.'
+                    'message' => $fullScan ? 'Full library rescan initiated on Navidrome.' : 'Library scan initiated on Navidrome.'
                 ];
             }
 

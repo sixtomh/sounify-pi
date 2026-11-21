@@ -1988,24 +1988,56 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Manual Navidrome scan
+  // Manual Navidrome scan (Quick)
   btnScanNavidrome?.addEventListener('click', async () => {
     navidromeFeedback.style.display = 'none';
     btnScanNavidrome.disabled = true;
 
     try {
+      showToast('Initiating quick scan on Navidrome...', 'info');
       const res = await fetch('/api/navidrome/scan', { method: 'POST' });
       const data = await res.json();
 
       navidromeFeedback.className = `alert-box ${data.success ? 'alert-success' : 'alert-error'}`;
       navidromeFeedback.textContent = data.message;
       navidromeFeedback.style.display = 'block';
+      showToast(data.message, data.success ? 'success' : 'error');
     } catch (err) {
       navidromeFeedback.className = 'alert-box alert-error';
       navidromeFeedback.textContent = 'Failed to request scan: ' + err.message;
       navidromeFeedback.style.display = 'block';
+      showToast('Navidrome scan error: ' + err.message, 'error');
     } finally {
       btnScanNavidrome.disabled = false;
+    }
+  });
+
+  // Manual Navidrome Full Rescan (Merges split albums & refreshes metadata)
+  const btnFullScanNavidrome = document.getElementById('btn-fullscan-navidrome');
+  btnFullScanNavidrome?.addEventListener('click', async () => {
+    navidromeFeedback.style.display = 'none';
+    btnFullScanNavidrome.disabled = true;
+
+    try {
+      showToast('Initiating full library rescan on Navidrome...', 'info');
+      const res = await fetch('/api/navidrome/scan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ full_scan: true })
+      });
+      const data = await res.json();
+
+      navidromeFeedback.className = `alert-box ${data.success ? 'alert-success' : 'alert-error'}`;
+      navidromeFeedback.textContent = data.message;
+      navidromeFeedback.style.display = 'block';
+      showToast(data.message, data.success ? 'success' : 'error');
+    } catch (err) {
+      navidromeFeedback.className = 'alert-box alert-error';
+      navidromeFeedback.textContent = 'Failed to request full scan: ' + err.message;
+      navidromeFeedback.style.display = 'block';
+      showToast('Navidrome full rescan error: ' + err.message, 'error');
+    } finally {
+      btnFullScanNavidrome.disabled = false;
     }
   });
 
