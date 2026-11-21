@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/style.css?v=1.2.5">
+  <link rel="stylesheet" href="/style.css?v=1.2.8">
 </head>
 <body>
   <div class="app-container">
@@ -80,7 +80,7 @@
       
       <!-- 1. HOME TAB -->
       <section class="tab-panel active" id="panel-home">
-        <!-- Quick Overview Stats -->
+        <!-- 1. Key Overview Stats -->
         <div class="stats-grid">
           <div class="glass-panel stat-card">
             <div class="stat-icon stat-icon-green">
@@ -123,29 +123,36 @@
           </div>
         </div>
 
-        <!-- Quick Jump Banner -->
-        <div class="glass-panel home-banner">
-          <div>
-            <h2>Ready to expand your library?</h2>
-            <p>Paste any Spotify track, album, or playlist to download and automatically sync with your Navidrome server.</p>
-          </div>
-          <div class="home-actions">
-            <button class="btn-primary" id="btn-home-go-search">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-              Go to Search
+        <!-- 2. Spotify-style Hero Search Card (Quick Download) -->
+        <div class="home-hero-card">
+          <h2 class="home-hero-title" id="home-greeting-heading">Good evening</h2>
+          <p class="home-hero-sub">Paste a link to download it, or search for something new.</p>
+          <form id="home-quick-download-form" class="home-hero-form">
+            <div class="home-hero-input-wrap">
+              <span class="home-hero-icon">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.3"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              </span>
+              <input 
+                type="text" 
+                id="home-quick-url-input" 
+                class="home-hero-input" 
+                placeholder="Spotify or YouTube Music link, or an artist, album, song..." 
+                autocomplete="off" 
+                required
+              >
+            </div>
+            <button type="submit" class="btn-home-hero-search" id="btn-home-quick-submit">
+              <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              <span>Search</span>
             </button>
-            <button class="btn-secondary" id="btn-home-scan-navidrome">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
-              Sync Navidrome Now
-            </button>
-          </div>
+          </form>
         </div>
 
-        <!-- Recent Additions Shelf -->
+        <!-- 3. Recently Added Shelf -->
         <div class="glass-panel" style="margin-top: 1.5rem;">
           <div class="panel-header">
             <div>
-              <h3>Recent Additions</h3>
+              <h3>Recently added</h3>
               <p class="panel-subtitle">Latest tracks saved to your Orange Pi music folder</p>
             </div>
             <button class="btn-ghost" id="btn-home-view-all">View All in Library &rarr;</button>
@@ -158,57 +165,94 @@
 
       <!-- 2. SEARCH TAB -->
       <section class="tab-panel" id="panel-search">
-        <div class="search-card glass-panel">
-          <div class="search-title-wrap">
-            <h2>Search &amp; Resolve Spotify URL</h2>
-            <p class="search-desc">Paste any link for tracks, albums, or public playlists (no API keys or premium accounts needed).</p>
-          </div>
-
-          <form id="resolve-form" class="url-input-group">
-            <div class="input-field-wrapper">
-              <span class="input-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
-              </span>
-              <input 
-                type="text" 
-                id="spotify-url-input" 
-                placeholder="https://open.spotify.com/track/... or album/... or playlist/..." 
-                autocomplete="off" 
-                required
-              >
-              <button type="button" id="paste-btn" class="btn-ghost" title="Paste from clipboard">
-                Paste
+        <div class="search-container">
+          
+          <!-- Search Header (Matching Library & Downloads design) -->
+          <div class="library-header-row">
+            <div>
+              <h1 class="library-title">Search</h1>
+              <p class="library-stats-line">Paste any link for tracks, albums, or public playlists to resolve and download</p>
+            </div>
+            <div class="library-header-actions">
+              <button type="button" class="btn-lib-action" id="btn-search-paste-header" title="Paste from clipboard">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+                <span>Paste Link</span>
               </button>
             </div>
-            <button type="submit" id="resolve-btn" class="btn-primary">
-              <span class="btn-text">Resolve</span>
-              <span class="spinner" style="display:none;"></span>
-            </button>
-          </form>
+          </div>
 
-          <div id="resolve-error" class="alert-box alert-error" style="display: none;"></div>
-        </div>
+          <div class="search-card glass-panel">
+            <form id="resolve-form" class="url-input-group">
+              <div class="input-field-wrapper">
+                <span class="input-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                </span>
+                <input 
+                  type="text" 
+                  id="spotify-url-input" 
+                  placeholder="https://open.spotify.com/track/... or album/... or playlist/..." 
+                  autocomplete="off" 
+                  required
+                >
+                <button type="button" id="paste-btn" class="btn-ghost" title="Paste from clipboard">
+                  Paste
+                </button>
+              </div>
+              <button type="submit" id="resolve-btn" class="btn-primary">
+                <span class="btn-text">Resolve</span>
+                <span class="spinner" style="display:none;"></span>
+              </button>
+            </form>
 
-        <!-- Resolved Media Preview -->
-        <div id="preview-container" class="preview-area" style="display: none;">
-          <!-- Dynamically injected with JavaScript -->
+            <!-- Smart Clipboard Suggestion Pill -->
+            <div id="clipboard-search-pill" class="clipboard-suggest-pill" style="display: none;">
+              <div class="pill-left">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+                <span>Spotify link detected: <strong id="clipboard-preview-url"></strong></span>
+              </div>
+              <div class="pill-right">
+                <button type="button" class="btn-pill-action" id="btn-clipboard-paste-now">Paste &amp; Search</button>
+                <button type="button" class="btn-pill-dismiss" id="btn-clipboard-dismiss" title="Dismiss">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+              </div>
+            </div>
+
+            <div id="resolve-error" class="alert-box alert-error" style="display: none;"></div>
+          </div>
+
+          <!-- Resolved Media Preview -->
+          <div id="preview-container" class="preview-area" style="display: none;">
+            <!-- Dynamically injected with JavaScript -->
+          </div>
+
         </div>
       </section>
 
       <!-- 3. DOWNLOADS TAB -->
       <section class="tab-panel" id="panel-downloads">
-        <div class="glass-panel queue-card">
-          <div class="panel-header">
+        <div class="downloads-container">
+          
+          <!-- Downloads Header (Matching Library Header design) -->
+          <div class="library-header-row">
             <div>
-              <h2>Active &amp; Recent Downloads</h2>
-              <p class="panel-subtitle">Real-time progress with audio conversion, ID3 tagging &amp; cover artwork</p>
+              <h1 class="library-title">Downloads</h1>
+              <p class="library-stats-line" id="downloads-stats-line">Active &amp; recent queue · Real-time conversion &amp; tagging</p>
             </div>
-            <button id="clear-jobs-btn" class="btn-secondary btn-sm">Clear Completed</button>
+            <div class="library-header-actions">
+              <button type="button" class="btn-lib-action" id="clear-jobs-btn" title="Clear completed downloads">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                <span>Clear Completed</span>
+              </button>
+            </div>
           </div>
 
-          <div id="jobs-list" class="jobs-container">
-            <div class="empty-state">No active downloads right now.</div>
+          <div class="glass-panel queue-card" style="padding: 1.25rem 1.5rem;">
+            <div id="jobs-list" class="jobs-container" style="margin-top: 0;">
+              <div class="empty-state">No active downloads right now.</div>
+            </div>
           </div>
+
         </div>
       </section>
 
@@ -251,8 +295,9 @@
             </div>
 
             <div class="lib-toolbar-right">
-              <div class="lib-sort-container">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 16 4 4 4-4"></path><path d="M7 20V4"></path><path d="m21 8-4-4-4 4"></path><path d="M17 4v16"></path></svg>
+              <div class="lib-sort-container" title="Sort library tracks">
+                <svg class="lib-sort-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m3 16 4 4 4-4"></path><path d="M7 20V4"></path><path d="m21 8-4-4-4 4"></path><path d="M17 4v16"></path></svg>
+                <span class="lib-sort-label">Sort:</span>
                 <select id="library-sort-select" class="lib-sort-select">
                   <option value="recent">Recently added</option>
                   <option value="title_asc">Title (A-Z)</option>
@@ -261,6 +306,7 @@
                   <option value="year_desc">Release Date</option>
                   <option value="duration_desc">Duration</option>
                 </select>
+                <svg class="lib-sort-arrow" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
               </div>
 
               <div class="lib-view-toggles">
@@ -284,6 +330,7 @@
             <table class="spotify-track-table">
               <thead>
                 <tr>
+                  <th style="width: 36px; text-align: center;"><input type="checkbox" id="chk-select-all" class="sp-checkbox" title="Select all tracks"></th>
                   <th style="width: 44px; text-align: center;">#</th>
                   <th style="min-width: 240px;">TITLE</th>
                   <th style="min-width: 170px;">ALBUM</th>
@@ -291,13 +338,34 @@
                   <th style="width: 120px;">ADDED ↑</th>
                   <th style="width: 110px;">RELEASE DATE</th>
                   <th style="width: 60px; text-align: right;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></th>
-                  <th style="width: 80px; text-align: center;"></th>
+                  <th style="width: 60px; text-align: center;"></th>
                 </tr>
               </thead>
               <tbody id="library-tbody">
-                <tr><td colspan="8" class="text-center" style="padding: 3rem; color: var(--text-dim);">Loading library...</td></tr>
+                <tr><td colspan="9" class="text-center" style="padding: 3rem; color: var(--text-dim);">Loading library...</td></tr>
               </tbody>
             </table>
+          </div>
+
+          <!-- Floating Bulk Actions Bar -->
+          <div id="library-bulk-bar" class="sp-bulk-bar" style="display: none;">
+            <div class="sp-bulk-info">
+              <span class="sp-bulk-dot"></span>
+              <span class="sp-bulk-count" id="bulk-selected-count">0 tracks selected</span>
+            </div>
+            <div class="sp-bulk-actions">
+              <button type="button" class="btn-bulk-action" id="btn-bulk-edit">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                <span>Bulk Edit</span>
+              </button>
+              <button type="button" class="btn-bulk-action btn-bulk-danger" id="btn-bulk-delete">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                <span>Delete</span>
+              </button>
+              <button type="button" class="btn-bulk-close" id="btn-bulk-clear" title="Deselect all">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
+            </div>
           </div>
 
         </div>
@@ -305,288 +373,434 @@
 
       <!-- 5. SETTINGS TAB -->
       <section class="tab-panel" id="panel-settings">
-        <form id="settings-form" class="settings-grid">
+        <form id="settings-form">
           
-          <!-- Storage & Formats -->
-          <div class="glass-panel settings-card">
-            <h3>Storage &amp; Audio Formats</h3>
-            <p class="card-desc">Output directory and quality settings for your Orange Pi</p>
-
-            <div class="form-group">
-              <label for="download_dir">Music Directory (Navidrome Library Folder):</label>
-              <input type="text" id="download_dir" name="download_dir" class="form-control" placeholder="/mnt/musica or /var/lib/navidrome/music" required>
-              <span class="help-text">Absolute path where downloaded music will be stored for Navidrome.</span>
+          <!-- Settings Header (Matching Library, Downloads & Search design) -->
+          <div class="library-header-row">
+            <div>
+              <h1 class="library-title">Settings</h1>
+              <p class="library-stats-line">Preferences, Navidrome integration, storage paths &amp; system security</p>
             </div>
-
-            <div class="form-row">
-              <div class="form-group flex-1">
-                <label for="audio_format">Audio Format:</label>
-                <select id="audio_format" name="audio_format" class="form-control">
-                  <option value="mp3">MP3 (Universal with ID3v2 &amp; Cover Art)</option>
-                  <option value="flac">FLAC (Lossless / High Fidelity)</option>
-                  <option value="m4a">M4A / AAC (Excellent Quality &amp; Compression)</option>
-                  <option value="opus">OPUS (Modern &amp; Efficient)</option>
-                </select>
-              </div>
-
-              <div class="form-group flex-1">
-                <label for="audio_bitrate">Bitrate (kbps):</label>
-                <select id="audio_bitrate" name="audio_bitrate" class="form-control">
-                  <option value="320">320 kbps (Maximum MP3 Quality)</option>
-                  <option value="256">256 kbps</option>
-                  <option value="192">192 kbps</option>
-                  <option value="128">128 kbps (Space Saver)</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label for="filename_format">File Naming Scheme:</label>
-              <select id="filename_format" name="filename_format" class="form-control">
-                <option value="artist_title">Artist - Song Title.ext (e.g. Queen - Bohemian Rhapsody.mp3)</option>
-                <option value="title_artist">Song Title - Artist.ext (e.g. Bohemian Rhapsody - Queen.mp3)</option>
-                <option value="title">Song Title.ext (e.g. Bohemian Rhapsody.mp3)</option>
-              </select>
-              <span class="help-text">Choose how downloaded audio files should be named on disk.</span>
-            </div>
-
-            <div class="form-checkbox-group">
-              <label class="checkbox-label">
-                <input type="checkbox" id="include_track_number" name="include_track_number" value="1">
-                <span>Prefix track number for album tracks (e.g. <code>01. Song.mp3</code>)</span>
-              </label>
-
-              <label class="checkbox-label">
-                <input type="checkbox" id="organize_by_artist" name="organize_by_artist" value="1">
-                <span>Organize in folders by Artist (<code>Artist/Song.ext</code>)</span>
-              </label>
-
-              <label class="checkbox-label">
-                <input type="checkbox" id="organize_by_album" name="organize_by_album" value="1">
-                <span>Organize in subfolders by Album (<code>Artist/Album/Song.ext</code>)</span>
-              </label>
-
-              <label class="checkbox-label">
-                <input type="checkbox" id="save_cover_image" name="save_cover_image" value="1">
-                <span>Save album cover image (<code>cover.jpg</code>) alongside music</span>
-              </label>
-
-              <label class="checkbox-label">
-                <input type="checkbox" id="save_m3u" name="save_m3u" value="1">
-                <span>Generate compatible <code>.m3u</code> playlists in <code>Playlists/</code></span>
-              </label>
-            </div>
-          </div>
-
-          <!-- Navidrome Integration -->
-          <div class="glass-panel settings-card">
-            <div class="card-title-flex">
-              <div>
-                <h3>Navidrome Integration</h3>
-                <p class="card-desc">Instant Subsonic API library synchronization</p>
-              </div>
-              <span id="navidrome-badge" class="status-indicator">Disabled</span>
-            </div>
-
-            <div class="form-checkbox-group">
-              <label class="checkbox-label">
-                <input type="checkbox" id="navidrome_enabled" name="navidrome_enabled" value="1">
-                <strong>Enable connection to Navidrome server</strong>
-              </label>
-            </div>
-
-            <div class="form-group">
-              <label for="navidrome_url">Navidrome Server URL:</label>
-              <input type="url" id="navidrome_url" name="navidrome_url" class="form-control" placeholder="http://127.0.0.1:4533">
-              <span class="help-text">If running on the same Orange Pi, usually <code>http://127.0.0.1:4533</code>.</span>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group flex-1">
-                <label for="navidrome_user">Navidrome Username:</label>
-                <input type="text" id="navidrome_user" name="navidrome_user" class="form-control" placeholder="admin">
-              </div>
-
-              <div class="form-group flex-1">
-                <label for="navidrome_pass">Password:</label>
-                <div class="password-input-wrap">
-                  <input type="password" id="navidrome_pass" name="navidrome_pass" class="form-control" placeholder="Enter Navidrome password">
-                  <button type="button" class="btn-toggle-password" data-target="navidrome_pass" aria-label="Toggle password visibility" title="Show / Hide password">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div class="form-checkbox-group">
-              <label class="checkbox-label">
-                <input type="checkbox" id="navidrome_auto_scan" name="navidrome_auto_scan" value="1">
-                <span>Automatically trigger library scan after each download finishes</span>
-              </label>
-            </div>
-
-            <div class="navidrome-actions">
-              <button type="button" id="btn-test-navidrome" class="btn-secondary">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                Test Connection
-              </button>
-
-              <button type="button" id="btn-scan-navidrome" class="btn-ghost">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
-                Scan Library Now
-              </button>
-            </div>
-
-            <div id="navidrome-feedback" class="alert-box" style="display:none;"></div>
-          </div>
-
-          <!-- Save Settings Action Footer (placed right above LAN Security) -->
-          <div class="settings-footer" style="grid-column: 1 / -1; margin: 0.5rem 0 0.5rem 0;">
-            <div style="display: flex; align-items: center; gap: 1rem;">
-              <button type="submit" class="btn-primary btn-lg">Save Settings</button>
+            <div class="library-header-actions">
               <span id="save-status" class="save-status" style="display:none;"></span>
+              <button type="submit" class="btn-primary" id="btn-save-settings-main">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                <span>Save Settings</span>
+              </button>
             </div>
           </div>
 
-          <!-- LAN Security & Authentication Settings -->
-          <div class="settings-card glass-panel" style="grid-column: 1 / -1;">
-            <div class="card-title-flex">
-              <div style="display: flex; align-items: center; gap: 0.75rem;">
-                <div class="card-icon" style="background: rgba(30, 215, 96, 0.15); color: var(--accent-primary); width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 10px;">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 20px; height: 20px;">
-                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                  </svg>
-                </div>
-                <div>
-                  <h3 style="margin: 0; font-size: 1.15rem; font-weight: 800;">LAN Security &amp; Access Control</h3>
-                  <p class="card-desc" style="margin: 0.2rem 0 0 0;">Authentication is permanently active to protect your Sounify Pi instance on your Wi-Fi network</p>
-                </div>
+          <div class="modern-settings-container">
+            
+            <!-- LEFT SIDEBAR -->
+            <aside class="settings-sidebar">
+              <div class="settings-sidebar-header">
+                <h3>Categories</h3>
+                <p>System &amp; server configuration</p>
               </div>
-              <span id="auth-badge" class="status-indicator online">Protected</span>
-            </div>
-
-            <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
-              <h4 style="font-size: 0.95rem; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.5rem;">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; color: var(--accent-primary);">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="12" cy="7" r="4"></circle>
-                </svg>
-                Account Credentials (Change Username &amp; Password)
-              </h4>
-              <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1rem;">
-                Active user: <code id="current-auth-username" style="color: var(--accent-primary); font-weight: 700; background: rgba(30, 215, 96, 0.12); padding: 2px 7px; border-radius: 4px;">admin</code>. Update credentials here (changes take effect immediately):
-              </p>
-
-              <div id="credentials-inputs-group" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1rem;">
-                <div class="form-group">
-                  <label for="sec-new-username">New Username</label>
-                  <input type="text" id="sec-new-username" class="form-control" placeholder="Leave blank to keep current" autocomplete="username">
-                </div>
-
-                <div class="form-group">
-                  <label for="sec-current-password">Current Password <span style="color:var(--error)">*</span></label>
-                  <div class="password-input-wrap">
-                    <input type="password" id="sec-current-password" class="form-control" placeholder="Required to confirm changes" autocomplete="current-password">
-                    <button type="button" class="btn-toggle-password" data-target="sec-current-password" aria-label="Toggle password visibility" title="Show / Hide password">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                    </button>
+              
+              <nav class="settings-nav-list" role="tablist" aria-label="Settings navigation">
+                <button type="button" class="settings-nav-item active" data-pane="pane-storage-formats" role="tab" aria-selected="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="settings-nav-icon"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path><path d="M9 13h6"></path><path d="M12 10v6"></path></svg>
+                  <div class="settings-nav-text">
+                    <span class="settings-nav-title">Storage &amp; Formats</span>
+                    <span class="settings-nav-desc">Directory, codecs &amp; bitrate</span>
                   </div>
-                </div>
-
-                <div class="form-group">
-                  <label for="sec-new-password">New Password</label>
-                  <div class="password-input-wrap">
-                    <input type="password" id="sec-new-password" class="form-control" placeholder="Minimum 4 characters" autocomplete="new-password">
-                    <button type="button" class="btn-toggle-password" data-target="sec-new-password" aria-label="Toggle password visibility" title="Show / Hide password">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                    </button>
-                  </div>
-                </div>
-
-                <div class="form-group">
-                  <label for="sec-confirm-password">Confirm New Password</label>
-                  <div class="password-input-wrap">
-                    <input type="password" id="sec-confirm-password" class="form-control" placeholder="Repeat new password" autocomplete="new-password">
-                    <button type="button" class="btn-toggle-password" data-target="sec-confirm-password" aria-label="Toggle password visibility" title="Show / Hide password">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <div style="margin-top: 1rem; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
-                <button type="button" id="btn-update-credentials" class="btn-secondary">
-                  Update Credentials
                 </button>
-                <div id="credentials-feedback" style="display:none; font-size: 0.88rem; font-weight: 500;"></div>
-              </div>
-            </div>
-          </div>
 
-          <!-- Database & Storage Maintenance -->
-          <div class="settings-card glass-panel" style="grid-column: 1 / -1;">
-            <div class="card-title-flex">
-              <div style="display: flex; align-items: center; gap: 0.75rem;">
-                <div class="card-icon" style="background: rgba(241, 94, 108, 0.15); color: var(--error); width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 10px;">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 20px; height: 20px;">
-                    <polyline points="3 6 5 6 21 6"></polyline>
-                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                    <line x1="10" y1="11" x2="10" y2="17"></line>
-                    <line x1="14" y1="11" x2="14" y2="17"></line>
-                  </svg>
-                </div>
-                <div>
-                  <h3 style="margin: 0; font-size: 1.15rem; font-weight: 800;">Database &amp; Storage Maintenance</h3>
-                  <p class="card-desc" style="margin: 0.2rem 0 0 0;">Purge downloaded history and download jobs from your SQLite database</p>
-                </div>
-              </div>
-            </div>
+                <button type="button" class="settings-nav-item" data-pane="pane-navidrome" role="tab" aria-selected="false">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="settings-nav-icon"><path d="M2 16.1A5 5 0 0 1 5.9 20M2 12.05A9 9 0 0 1 9.95 20M2 8V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6"></path><line x1="2" y1="20" x2="2.01" y2="20"></line></svg>
+                  <div class="settings-nav-text">
+                    <span class="settings-nav-title">Navidrome Integration</span>
+                    <span class="settings-nav-desc">Subsonic sync &amp; auto-scan</span>
+                  </div>
+                </button>
 
-            <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
-              <div class="form-checkbox-group" style="margin-bottom: 1.25rem;">
-                <label class="checkbox-label" style="display: flex; align-items: flex-start; gap: 0.65rem;">
-                  <input type="checkbox" id="clean-keep-audio-files" name="clean_keep_audio_files" value="1" checked style="margin-top: 3px;">
+                <button type="button" class="settings-nav-item" data-pane="pane-security" role="tab" aria-selected="false">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="settings-nav-icon"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                  <div class="settings-nav-text">
+                    <span class="settings-nav-title">LAN Security</span>
+                    <span class="settings-nav-desc">Password &amp; access control</span>
+                  </div>
+                </button>
+
+                <button type="button" class="settings-nav-item" data-pane="pane-maintenance" role="tab" aria-selected="false">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="settings-nav-icon"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                  <div class="settings-nav-text">
+                    <span class="settings-nav-title">Maintenance</span>
+                    <span class="settings-nav-desc">Purge history &amp; database</span>
+                  </div>
+                </button>
+
+                <button type="button" class="settings-nav-item" data-pane="pane-disk" role="tab" aria-selected="false">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="settings-nav-icon"><path d="M22 12H2"></path><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path><line x1="6" y1="16" x2="6.01" y2="16"></line><line x1="10" y1="16" x2="10.01" y2="16"></line></svg>
+                  <div class="settings-nav-text">
+                    <span class="settings-nav-title">Orange Pi Storage</span>
+                    <span class="settings-nav-desc">Disk capacity &amp; health</span>
+                  </div>
+                </button>
+
+                <button type="button" class="settings-nav-item" data-pane="pane-version" role="tab" aria-selected="false">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="settings-nav-icon"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                  <div class="settings-nav-text">
+                    <span class="settings-nav-title">System &amp; About</span>
+                    <span class="settings-nav-desc">Version &amp; environment</span>
+                  </div>
+                </button>
+              </nav>
+            </aside>
+
+            <!-- RIGHT CONTENT PANE -->
+            <div class="settings-content-pane">
+              
+              <!-- PANE 1: STORAGE & AUDIO FORMATS -->
+              <div class="settings-pane-section active" id="pane-storage-formats">
+                <div class="settings-pane-header">
                   <div>
-                    <strong style="color: var(--text-main); font-size: 0.95rem;">Keep audio files on disk (Preserve MP3/FLAC music files)</strong>
-                    <div style="font-size: 0.83rem; color: var(--text-muted); margin-top: 0.2rem;">
-                      When checked, only database records (history and download queue) are wiped. Uncheck this if you also want to permanently delete downloaded audio files from disk.
+                    <h2 class="settings-pane-title">Storage &amp; Audio Formats</h2>
+                    <p class="settings-pane-subtitle">Output directory and quality settings for your Orange Pi</p>
+                  </div>
+                </div>
+
+              <div class="glass-panel settings-card">
+                <div class="form-group">
+                  <label for="download_dir">Music Directory (Navidrome Library Folder):</label>
+                  <input type="text" id="download_dir" name="download_dir" class="form-control" placeholder="/mnt/musica or /var/lib/navidrome/music" required>
+                  <span class="help-text">Absolute path where downloaded music will be stored for Navidrome.</span>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group flex-1">
+                    <label for="audio_format">Audio Format:</label>
+                    <select id="audio_format" name="audio_format" class="form-control">
+                      <option value="mp3">MP3 (Universal with ID3v2 &amp; Cover Art)</option>
+                      <option value="flac">FLAC (Lossless / High Fidelity)</option>
+                      <option value="m4a">M4A / AAC (Excellent Quality &amp; Compression)</option>
+                      <option value="opus">OPUS (Modern &amp; Efficient)</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group flex-1">
+                    <label for="audio_bitrate">Bitrate (kbps):</label>
+                    <select id="audio_bitrate" name="audio_bitrate" class="form-control">
+                      <option value="320">320 kbps (Maximum MP3 Quality)</option>
+                      <option value="256">256 kbps</option>
+                      <option value="192">192 kbps</option>
+                      <option value="128">128 kbps (Space Saver)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="filename_format">File Naming Scheme:</label>
+                  <select id="filename_format" name="filename_format" class="form-control">
+                    <option value="artist_title">Artist - Song Title.ext (e.g. Queen - Bohemian Rhapsody.mp3)</option>
+                    <option value="title_artist">Song Title - Artist.ext (e.g. Bohemian Rhapsody - Queen.mp3)</option>
+                    <option value="title">Song Title.ext (e.g. Bohemian Rhapsody.mp3)</option>
+                  </select>
+                  <span class="help-text">Choose how downloaded audio files should be named on disk.</span>
+                </div>
+
+                <div class="form-checkbox-group">
+                  <label class="checkbox-label">
+                    <input type="checkbox" id="include_track_number" name="include_track_number" value="1">
+                    <span>Prefix track number for album tracks (e.g. <code>01. Song.mp3</code>)</span>
+                  </label>
+
+                  <label class="checkbox-label">
+                    <input type="checkbox" id="organize_by_artist" name="organize_by_artist" value="1">
+                    <span>Organize in folders by Artist (<code>Artist/Song.ext</code>)</span>
+                  </label>
+
+                  <label class="checkbox-label">
+                    <input type="checkbox" id="organize_by_album" name="organize_by_album" value="1">
+                    <span>Organize in subfolders by Album (<code>Artist/Album/Song.ext</code>)</span>
+                  </label>
+
+                  <label class="checkbox-label">
+                    <input type="checkbox" id="save_cover_image" name="save_cover_image" value="1">
+                    <span>Save album cover image (<code>cover.jpg</code>) alongside music</span>
+                  </label>
+
+                  <label class="checkbox-label">
+                    <input type="checkbox" id="save_m3u" name="save_m3u" value="1">
+                    <span>Generate compatible <code>.m3u</code> playlists in <code>Playlists/</code></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- PANE 2: NAVIDROME INTEGRATION -->
+            <div class="settings-pane-section" id="pane-navidrome">
+              <div class="settings-pane-header">
+                <div>
+                  <h2 class="settings-pane-title">Navidrome Integration</h2>
+                  <p class="settings-pane-subtitle">Instant Subsonic API library synchronization</p>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                  <span id="navidrome-badge" class="status-indicator">Disabled</span>
+                </div>
+              </div>
+
+              <div class="glass-panel settings-card">
+                <div class="form-checkbox-group">
+                  <label class="checkbox-label">
+                    <input type="checkbox" id="navidrome_enabled" name="navidrome_enabled" value="1">
+                    <strong>Enable connection to Navidrome server</strong>
+                  </label>
+                </div>
+
+                <div class="form-group">
+                  <label for="navidrome_url">Navidrome Server URL:</label>
+                  <input type="url" id="navidrome_url" name="navidrome_url" class="form-control" placeholder="http://127.0.0.1:4533">
+                  <span class="help-text">If running on the same Orange Pi, usually <code>http://127.0.0.1:4533</code>.</span>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group flex-1">
+                    <label for="navidrome_user">Navidrome Username:</label>
+                    <input type="text" id="navidrome_user" name="navidrome_user" class="form-control" placeholder="admin">
+                  </div>
+
+                  <div class="form-group flex-1">
+                    <label for="navidrome_pass">Password:</label>
+                    <div class="password-input-wrap">
+                      <input type="password" id="navidrome_pass" name="navidrome_pass" class="form-control" placeholder="Enter Navidrome password">
+                      <button type="button" class="btn-toggle-password" data-target="navidrome_pass" aria-label="Toggle password visibility" title="Show / Hide password">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                      </button>
                     </div>
                   </div>
-                </label>
-              </div>
+                </div>
 
-              <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
-                <button type="button" id="btn-clean-database" class="btn-danger-outline">
-                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                  Clean Database Now
-                </button>
-                <div id="clean-db-feedback" style="display: none; font-size: 0.88rem; font-weight: 500;"></div>
+                <div class="form-checkbox-group">
+                  <label class="checkbox-label">
+                    <input type="checkbox" id="navidrome_auto_scan" name="navidrome_auto_scan" value="1">
+                    <span>Automatically trigger library scan after each download finishes</span>
+                  </label>
+                </div>
+
+                <div class="navidrome-actions">
+                  <button type="button" id="btn-test-navidrome" class="btn-secondary">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                    Test Connection
+                  </button>
+
+                  <button type="button" id="btn-scan-navidrome" class="btn-ghost">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                    Scan Library Now
+                  </button>
+                </div>
+
+                <div id="navidrome-feedback" class="alert-box" style="display:none;"></div>
               </div>
             </div>
-          </div>
 
-          <!-- System & App Version -->
-          <div class="glass-panel settings-card" style="grid-column: 1 / -1;">
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-              <div style="display: flex; align-items: center; gap: 0.75rem;">
-                <div class="brand-icon" style="width: 36px; height: 36px;">
-                  <img src="/logo.svg" alt="Sounify Pi Logo" class="brand-logo-img" style="width: 36px; height: 36px;">
-                </div>
+            <!-- PANE 3: LAN SECURITY & ACCESS CONTROL -->
+            <div class="settings-pane-section" id="pane-security">
+              <div class="settings-pane-header">
                 <div>
-                  <h3 style="margin: 0; font-size: 1.05rem; display: flex; align-items: center; gap: 0.5rem;">
-                    Sounify Pi
-                    <span style="font-size: 0.75rem; background: var(--accent-primary); color: #000; padding: 2px 8px; border-radius: 999px; font-weight: 700;">v1.2.0</span>
-                  </h3>
-                  <p class="card-desc" style="margin: 0.2rem 0 0 0;">Music Downloader &amp; Navidrome Synchronizer for Orange Pi / Linux</p>
+                  <h2 class="settings-pane-title">LAN Security &amp; Access Control</h2>
+                  <p class="settings-pane-subtitle">Authentication protects your Sounify Pi instance on your Wi-Fi network</p>
+                </div>
+                <span id="auth-badge" class="status-indicator online">Protected</span>
+              </div>
+
+              <div class="glass-panel settings-card">
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem;">
+                  <div class="card-icon" style="background: rgba(30, 215, 96, 0.15); color: var(--accent-primary); width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 10px;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 20px; height: 20px;">
+                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                      <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                  </div>
+                  <div>
+                    <h4 style="margin: 0; font-size: 1rem; font-weight: 700;">Account Credentials</h4>
+                    <p style="font-size: 0.82rem; color: var(--text-muted); margin: 0.2rem 0 0 0;">
+                      Active user: <code id="current-auth-username" style="color: var(--accent-primary); font-weight: 700; background: rgba(30, 215, 96, 0.12); padding: 2px 7px; border-radius: 4px;">admin</code>. Update credentials below:
+                    </p>
+                  </div>
+                </div>
+
+                <div id="credentials-inputs-group" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1rem;">
+                  <div class="form-group">
+                    <label for="sec-new-username">New Username</label>
+                    <input type="text" id="sec-new-username" class="form-control" placeholder="Leave blank to keep current" autocomplete="username">
+                  </div>
+
+                  <div class="form-group">
+                    <label for="sec-current-password">Current Password <span style="color:var(--error)">*</span></label>
+                    <div class="password-input-wrap">
+                      <input type="password" id="sec-current-password" class="form-control" placeholder="Required to confirm changes" autocomplete="current-password">
+                      <button type="button" class="btn-toggle-password" data-target="sec-current-password" aria-label="Toggle password visibility" title="Show / Hide password">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="sec-new-password">New Password</label>
+                    <div class="password-input-wrap">
+                      <input type="password" id="sec-new-password" class="form-control" placeholder="Minimum 4 characters" autocomplete="new-password">
+                      <button type="button" class="btn-toggle-password" data-target="sec-new-password" aria-label="Toggle password visibility" title="Show / Hide password">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="sec-confirm-password">Confirm New Password</label>
+                    <div class="password-input-wrap">
+                      <input type="password" id="sec-confirm-password" class="form-control" placeholder="Repeat new password" autocomplete="new-password">
+                      <button type="button" class="btn-toggle-password" data-target="sec-confirm-password" aria-label="Toggle password visibility" title="Show / Hide password">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div style="margin-top: 1.25rem; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                  <button type="button" id="btn-update-credentials" class="btn-secondary">
+                    Update Credentials
+                  </button>
+                  <div id="credentials-feedback" style="display:none; font-size: 0.88rem; font-weight: 500;"></div>
                 </div>
               </div>
-              <div style="font-size: 0.82rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace;">
-                PHP 8.3 · SQLite · Subsonic API
+            </div>
+
+            <!-- PANE 4: DATABASE & STORAGE MAINTENANCE -->
+            <div class="settings-pane-section" id="pane-maintenance">
+              <div class="settings-pane-header">
+                <div>
+                  <h2 class="settings-pane-title">Database &amp; Storage Maintenance</h2>
+                  <p class="settings-pane-subtitle">Purge downloaded history and download jobs from your SQLite database</p>
+                </div>
+              </div>
+
+              <div class="glass-panel settings-card">
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem;">
+                  <div class="card-icon" style="background: rgba(241, 94, 108, 0.15); color: var(--error); width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 10px;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 20px; height: 20px;">
+                      <polyline points="3 6 5 6 21 6"></polyline>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                      <line x1="10" y1="11" x2="10" y2="17"></line>
+                      <line x1="14" y1="11" x2="14" y2="17"></line>
+                    </svg>
+                  </div>
+                  <div>
+                    <h4 style="margin: 0; font-size: 1rem; font-weight: 700;">Clean Database Records</h4>
+                    <p style="font-size: 0.82rem; color: var(--text-muted); margin: 0.2rem 0 0 0;">
+                      Safely reset your database while choosing whether to retain physical audio files
+                    </p>
+                  </div>
+                </div>
+
+                <div class="form-checkbox-group" style="margin-bottom: 1.25rem;">
+                  <label class="checkbox-label" style="display: flex; align-items: flex-start; gap: 0.65rem;">
+                    <input type="checkbox" id="clean-keep-audio-files" name="clean_keep_audio_files" value="1" checked style="margin-top: 3px;">
+                    <div>
+                      <strong style="color: var(--text-main); font-size: 0.95rem;">Keep audio files on disk (Preserve MP3/FLAC music files)</strong>
+                      <div style="font-size: 0.83rem; color: var(--text-muted); margin-top: 0.2rem;">
+                        When checked, only database records (history and download queue) are wiped. Uncheck this if you also want to permanently delete downloaded audio files from disk.
+                      </div>
+                    </div>
+                  </label>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                  <button type="button" id="btn-clean-database" class="btn-danger-outline">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                    Clean Database Now
+                  </button>
+                  <div id="clean-db-feedback" style="display: none; font-size: 0.88rem; font-weight: 500;"></div>
+                </div>
               </div>
             </div>
-          </div>
 
+            <!-- PANE 5: ORANGE PI DISK STORAGE -->
+            <div class="settings-pane-section" id="pane-disk">
+              <div class="settings-pane-header">
+                <div>
+                  <h2 class="settings-pane-title">Orange Pi Storage</h2>
+                  <p class="settings-pane-subtitle">Music download directory space &amp; filesystem health</p>
+                </div>
+                <div class="home-storage-stats-right" style="text-align: right;">
+                  <span class="home-storage-val" id="home-stat-storage">-- / -- GB</span>
+                  <span class="home-storage-sub" id="home-stat-storage-sub">Free: -- GB (0% used)</span>
+                </div>
+              </div>
+
+              <div class="glass-panel settings-card home-storage-card" style="margin-bottom: 0;">
+                <div style="margin-bottom: 1.25rem;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <span style="font-size: 0.88rem; font-weight: 600; color: var(--text-main);">Storage Utilization</span>
+                    <span style="font-size: 0.82rem; color: var(--accent-primary); font-family: 'JetBrains Mono', monospace;">Live filesystem check</span>
+                  </div>
+                  <div class="home-storage-track">
+                    <div class="home-storage-bar-fill" id="home-storage-fill" style="width: 0%;"></div>
+                  </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+                  <div style="background: rgba(255, 255, 255, 0.03); padding: 0.85rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+                    <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Target Architecture</div>
+                    <div style="font-size: 0.95rem; font-weight: 700; color: var(--text-main); margin-top: 0.25rem;">Linux ARM64 / Orange Pi</div>
+                  </div>
+                  <div style="background: rgba(255, 255, 255, 0.03); padding: 0.85rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+                    <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Storage Partition</div>
+                    <div style="font-size: 0.95rem; font-weight: 700; color: var(--text-main); margin-top: 0.25rem;">Auto-detected mount</div>
+                  </div>
+                  <div style="background: rgba(255, 255, 255, 0.03); padding: 0.85rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+                    <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Download Engine</div>
+                    <div style="font-size: 0.95rem; font-weight: 700; color: var(--accent-primary); margin-top: 0.25rem;">yt-dlp + FFmpeg</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- PANE 6: SYSTEM & APP VERSION -->
+            <div class="settings-pane-section" id="pane-version">
+              <div class="settings-pane-header">
+                <div>
+                  <h2 class="settings-pane-title">System &amp; App Version</h2>
+                  <p class="settings-pane-subtitle">Environment, dependencies and system runtime specifications</p>
+                </div>
+                <span style="font-size: 0.78rem; background: var(--accent-primary); color: #000; padding: 4px 10px; border-radius: 999px; font-weight: 800;">v1.3.0</span>
+              </div>
+
+              <div class="glass-panel settings-card">
+                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; padding-bottom: 1.25rem; border-bottom: 1px solid var(--border-color);">
+                  <div class="brand-icon" style="width: 48px; height: 48px; border-radius: 12px; background: rgba(30, 215, 96, 0.12); display: flex; align-items: center; justify-content: center;">
+                    <img src="/logo.svg" alt="Sounify Pi Logo" class="brand-logo-img" style="width: 32px; height: 32px;">
+                  </div>
+                  <div>
+                    <h3 style="margin: 0; font-size: 1.2rem; font-weight: 800;">Sounify Pi</h3>
+                    <p class="card-desc" style="margin: 0.2rem 0 0 0;">Music Downloader &amp; Navidrome Synchronizer for Orange Pi / Linux</p>
+                  </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+                  <div style="background: rgba(255, 255, 255, 0.03); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+                    <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Runtime</div>
+                    <div style="font-size: 1rem; font-weight: 700; color: var(--text-main); margin-top: 0.35rem; font-family: 'JetBrains Mono', monospace;">PHP 8.3 CLI / FPM</div>
+                  </div>
+                  <div style="background: rgba(255, 255, 255, 0.03); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+                    <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Database</div>
+                    <div style="font-size: 1rem; font-weight: 700; color: var(--text-main); margin-top: 0.35rem; font-family: 'JetBrains Mono', monospace;">SQLite 3 (WAL mode)</div>
+                  </div>
+                  <div style="background: rgba(255, 255, 255, 0.03); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+                    <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Integration</div>
+                    <div style="font-size: 1rem; font-weight: 700; color: var(--text-main); margin-top: 0.35rem; font-family: 'JetBrains Mono', monospace;">Subsonic REST API</div>
+                  </div>
+                  <div style="background: rgba(255, 255, 255, 0.03); padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+                    <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">License / Deployment</div>
+                    <div style="font-size: 1rem; font-weight: 700; color: var(--accent-primary); margin-top: 0.35rem;">Self-hosted / Open Source</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
         </form>
       </section>
 
@@ -594,7 +808,7 @@
 
     <!-- Footer -->
     <footer class="app-footer">
-      <p>Sounify Pi · Self-hosted on Orange Pi · Integrated with Navidrome Subsonic API · <a href="/docs/" target="_blank" style="color: var(--accent-primary); text-decoration: underline;">View Documentation &amp; Setup Guide</a></p>
+      <p>&copy; 2026 Sounify Pi · Self-hosted on Orange Pi · Integrated with Navidrome Subsonic API · <a href="/docs/" target="_blank" style="color: var(--accent-primary); text-decoration: underline;">View Documentation &amp; Setup Guide</a></p>
     </footer>
   </div>
 
@@ -663,6 +877,152 @@
     </div>
   </footer>
 
-  <script src="/app.js?v=1.2.5"></script>
+  <!-- Track Context Menu -->
+  <div id="track-context-menu" class="sp-context-menu" style="display: none;">
+    <button type="button" class="sp-context-item" id="ctx-btn-play">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg>
+      <span>Play</span>
+    </button>
+    <button type="button" class="sp-context-item" id="ctx-btn-edit">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+      <span>Edit Metadata</span>
+    </button>
+    <div class="sp-context-divider"></div>
+    <button type="button" class="sp-context-item item-danger" id="ctx-btn-delete">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+      <span>Delete Track</span>
+    </button>
+  </div>
+
+  <!-- Edit Metadata Modal -->
+  <div id="modal-edit-metadata" class="sp-modal-backdrop" style="display: none;">
+    <div class="sp-modal-content">
+      <div class="sp-modal-header">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <div class="sp-modal-icon">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+          </div>
+          <div>
+            <h3 class="sp-modal-title">Edit Track Metadata</h3>
+            <p class="sp-modal-subtitle">Modify song tags and album information</p>
+          </div>
+        </div>
+        <button type="button" class="sp-modal-close" id="btn-close-edit-modal" title="Close">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <form id="form-edit-metadata" class="sp-modal-body">
+        <input type="hidden" id="edit-track-id" name="id">
+
+        <div class="modal-form-row">
+          <div class="modal-cover-preview-wrap">
+            <img id="edit-cover-preview" src="/logo.svg" alt="Cover Preview" class="modal-cover-preview">
+          </div>
+          <div class="modal-fields-col">
+            <div class="form-group" style="margin-bottom: 0.85rem;">
+              <label for="edit-track-title">Title</label>
+              <input type="text" id="edit-track-title" name="title" class="form-control" required autocomplete="off">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="edit-track-artist">Artist(s)</label>
+              <input type="text" id="edit-track-artist" name="artist" class="form-control" required autocomplete="off">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 0.85rem;">
+          <label for="edit-track-album">Album Name</label>
+          <input type="text" id="edit-track-album" name="album" class="form-control" placeholder="e.g. Transitorio" required autocomplete="off">
+          <span class="help-text" style="font-size: 0.78rem; color: var(--text-dim); margin-top: 0.25rem;">
+            Changing the album name reorganizes the track under this album in your library and updates ID3 tags.
+          </span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; margin-bottom: 1.25rem;">
+          <div class="form-group" style="margin: 0;">
+            <label for="edit-track-year">Year / Release Date</label>
+            <input type="text" id="edit-track-year" name="year" class="form-control" placeholder="e.g. 2024" autocomplete="off">
+          </div>
+          <div class="form-group" style="margin: 0;">
+            <label for="edit-track-genre">Genre</label>
+            <input type="text" id="edit-track-genre" name="genre" class="form-control" placeholder="e.g. Hip-Hop/Rap" autocomplete="off">
+          </div>
+        </div>
+
+        <div id="edit-modal-feedback" style="display: none; margin-bottom: 1rem; font-size: 0.88rem; font-weight: 500;"></div>
+
+        <div class="sp-modal-footer">
+          <button type="button" class="btn-secondary btn-md" id="btn-cancel-edit-modal">Cancel</button>
+          <button type="submit" class="btn-primary btn-md" id="btn-save-edit-modal">
+            <span class="btn-text">Save Changes</span>
+            <span class="spinner" style="display: none; width: 14px; height: 14px; border-width: 2px;"></span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Bulk Edit Metadata Modal -->
+  <div id="modal-bulk-edit" class="sp-modal-backdrop" style="display: none;">
+    <div class="sp-modal-content">
+      <div class="sp-modal-header">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <div class="sp-modal-icon">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+          </div>
+          <div>
+            <h3 class="sp-modal-title">Bulk Edit Metadata</h3>
+            <p class="sp-modal-subtitle" id="bulk-edit-subtitle">Update album or metadata for selected tracks</p>
+          </div>
+        </div>
+        <button type="button" class="sp-modal-close" id="btn-close-bulk-modal" title="Close">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <form id="form-bulk-edit" class="sp-modal-body">
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem; line-height: 1.4;">
+          Fill in only the fields you wish to change for all selected tracks. Leave any field blank to preserve its current value.
+        </p>
+
+        <div class="form-group" style="margin-bottom: 0.85rem;">
+          <label for="bulk-edit-album">New Album Name</label>
+          <input type="text" id="bulk-edit-album" class="form-control" placeholder="Leave blank to keep existing albums" autocomplete="off">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 0.85rem;">
+          <label for="bulk-edit-artist">New Artist(s)</label>
+          <input type="text" id="bulk-edit-artist" class="form-control" placeholder="Leave blank to keep existing artists" autocomplete="off">
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; margin-bottom: 1.25rem;">
+          <div class="form-group" style="margin: 0;">
+            <label for="bulk-edit-year">Year</label>
+            <input type="text" id="bulk-edit-year" class="form-control" placeholder="e.g. 2024" autocomplete="off">
+          </div>
+          <div class="form-group" style="margin: 0;">
+            <label for="bulk-edit-genre">Genre</label>
+            <input type="text" id="bulk-edit-genre" class="form-control" placeholder="e.g. Hip-Hop/Rap" autocomplete="off">
+          </div>
+        </div>
+
+        <div id="bulk-modal-feedback" style="display: none; margin-bottom: 1rem; font-size: 0.88rem; font-weight: 500;"></div>
+
+        <div class="sp-modal-footer">
+          <button type="button" class="btn-secondary btn-md" id="btn-cancel-bulk-modal">Cancel</button>
+          <button type="submit" class="btn-primary btn-md" id="btn-save-bulk-modal">
+            <span class="btn-text">Apply to Selected</span>
+            <span class="spinner" style="display: none; width: 14px; height: 14px; border-width: 2px;"></span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Floating Toast Notifications Container -->
+  <div id="sp-toast-container" class="sp-toast-container" aria-live="polite"></div>
+
+  <script src="/app.js?v=1.2.9"></script>
 </body>
 </html>

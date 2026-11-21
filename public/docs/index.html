@@ -204,7 +204,7 @@
                 <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
                 <span>Changelog</span>
               </div>
-              <span style="font-size: 0.65rem; background: var(--accent); color: #000; padding: 1px 6px; border-radius: 99px; font-weight: 800;">v1.2.0</span>
+              <span style="font-size: 0.65rem; background: var(--accent); color: #000; padding: 1px 6px; border-radius: 99px; font-weight: 800;">v1.3.0</span>
             </a>
           </li>
         </ul>
@@ -245,7 +245,7 @@
               </a>
             </div>
             <div class="badge-row">
-              <span class="meta-badge highlight">v1.2.0 Latest</span>
+              <span class="meta-badge highlight">v1.3.0 Latest</span>
               <span class="meta-badge">Orange Pi &amp; ARM64</span>
               <span class="meta-badge">Zero API Keys</span>
               <span class="meta-badge">Navidrome Subsonic Auto-Sync</span>
@@ -1132,12 +1132,71 @@ sudo chmod -R 775 storage/downloads/</code></pre>
 
           <div class="changelog-timeline">
             
+            <!-- v1.3.0 -->
+            <div class="changelog-release">
+              <div class="changelog-dot"></div>
+              <div class="changelog-header">
+                <span class="changelog-version">v1.3.0</span>
+                <span class="changelog-tag tag-latest">Latest</span>
+                <span class="changelog-date">November 2026</span>
+              </div>
+              <div class="changelog-card">
+                <h4><span class="badge-pill pill-feat">FEATURE</span> Modern Two-Column Settings Dashboard</h4>
+                <ul>
+                  <li>Redesigned <strong>Settings</strong> with an intuitive left sidebar navigation menu and full-width right content panes.</li>
+                  <li>Grouped settings cleanly into 6 dedicated categories: <em>Storage &amp; Formats</em>, <em>Navidrome Integration</em>, <em>LAN Security</em>, <em>Database Maintenance</em>, <em>Orange Pi Storage</em>, and <em>System &amp; About</em>.</li>
+                  <li>Intelligent conditional action bar: <strong>Save Settings</strong> automatically displays only on configurable views and hides on read-only/action-specific views (Security, Maintenance, Storage telemetry, Version).</li>
+                  <li>Responsive layout: automatically collapses into a smooth horizontal scrolling pill tab-strip on mobile and tablet screens.</li>
+                </ul>
+
+                <h4><span class="badge-pill pill-feat">FEATURE</span> Unified Page Headers Across All Views</h4>
+                <ul>
+                  <li>Standardized the top header across <strong>Search</strong>, <strong>Downloads</strong>, <strong>Library</strong>, and <strong>Settings</strong> with consistent bold typography (<code>2.25rem</code>), dynamic metadata subtitles, and interactive pill action buttons.</li>
+                  <li><strong>Search:</strong> Added top <em>Paste Link</em> action button and live URL resolver description.</li>
+                  <li><strong>Downloads:</strong> Added dynamic queue status line (active vs completed tasks) and quick <em>Clear Completed</em> action button.</li>
+                  <li><strong>Settings:</strong> Added unified top-level header with contextual saving and clean sidebar structure.</li>
+                </ul>
+
+                <h4><span class="badge-pill pill-feat">FEATURE</span> Spotify-Style Home Hero &amp; Quick Download</h4>
+                <ul>
+                  <li>Added dynamic time-based greeting card (<em>"Good morning"</em>, <em>"Good afternoon"</em>, <em>"Good evening"</em>) with Spotify-style search bar.</li>
+                  <li>Instantly triggers searches and resolves music links directly from the Home view with full-pill borders.</li>
+                  <li>Relocated Orange Pi Storage health telemetry into a dedicated section inside Settings.</li>
+                </ul>
+
+                <h4><span class="badge-pill pill-feat">FEATURE</span> Bulk Tagging &amp; Multi-Track Deletion</h4>
+                <ul>
+                  <li>Added multi-select checkboxes across tracks in Library with master <em>Select All</em> toggle.</li>
+                  <li>Floating bulk action bar displaying real-time selection counts with <strong>Bulk Edit</strong> and <strong>Delete</strong> actions.</li>
+                  <li>Batch metadata modal dialog to simultaneously update album names, artists, years, and genres across multiple tracks without re-encoding audio.</li>
+                </ul>
+
+                <h4><span class="badge-pill pill-feat">FEATURE</span> Floating Toast Notifications &amp; Global Shortcuts</h4>
+                <ul>
+                  <li>Built-in non-intrusive floating toast notifications with auto-dismiss and color-coded status badges (Success, Error, Warning, Info).</li>
+                  <li>Interactive <strong>Keyboard Shortcuts</strong> modal (press <kbd>?</kbd> anywhere): <kbd>/</kbd> for search focus, <kbd>H</kbd>/<kbd>S</kbd>/<kbd>D</kbd>/<kbd>L</kbd>/<kbd>T</kbd> for tab switching, and <kbd>Esc</kbd> to close overlays.</li>
+                </ul>
+
+                <h4><span class="badge-pill pill-feat">FEATURE</span> Smart Clipboard Link Detection &amp; Skeleton Shimmer</h4>
+                <ul>
+                  <li>Automatic clipboard inspection when opening the Search tab with interactive suggestion pill to <em>Paste &amp; Search</em> in one click.</li>
+                  <li>Pulsing skeleton shimmer placeholder animations for album artwork cards and table rows during initial data loads.</li>
+                </ul>
+
+                <h4><span class="badge-pill pill-fix">POLISH</span> UI Branding &amp; Clean Architecture</h4>
+                <ul>
+                  <li>Updated header logo spacing, eliminated static animation, and modernized copyright footer.</li>
+                  <li>Updated cache busting across all assets for instantaneous, zero-cache updates.</li>
+                </ul>
+              </div>
+            </div>
+
             <!-- v1.2.0 -->
             <div class="changelog-release">
               <div class="changelog-dot"></div>
               <div class="changelog-header">
                 <span class="changelog-version">v1.2.0</span>
-                <span class="changelog-tag tag-latest">Latest</span>
+                <span class="changelog-tag tag-release">Release</span>
                 <span class="changelog-date">November 2026</span>
               </div>
               <div class="changelog-card">
@@ -1166,6 +1225,13 @@ sudo chmod -R 775 storage/downloads/</code></pre>
                 <ul>
                   <li>Automatic extraction of embedded album artwork from audio files via FFmpeg on demand.</li>
                   <li>Instant caching into <code>storage/covers/&lt;id&gt;.jpg</code> upon download completion with multi-tier Spotify fallbacks.</li>
+                </ul>
+
+                <h4><span class="badge-pill pill-feat">FEATURE</span> Track Context Menu &amp; Metadata Editor</h4>
+                <ul>
+                  <li>Added a floating 3-dots contextual action menu to library tracks with <strong>Play</strong>, <strong>Edit Metadata</strong>, and <strong>Delete Track</strong>.</li>
+                  <li>Added modal dialog to edit Title, Artist, Album, Year, and Genre directly in the UI.</li>
+                  <li>Edits write directly to physical ID3 audio tags without re-encoding and update SQLite history, instantly reorganizing albums in Library and Navidrome.</li>
                 </ul>
 
                 <h4><span class="badge-pill pill-feat">FEATURE</span> Library Track Deletion &amp; High-Contrast Polish</h4>

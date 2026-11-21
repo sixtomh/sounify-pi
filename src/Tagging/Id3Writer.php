@@ -33,6 +33,8 @@ class Id3Writer
             $cmd[] = '-disposition:v:0';
             $cmd[] = 'attached_pic';
         } else {
+            $cmd[] = '-map';
+            $cmd[] = '0';
             $cmd[] = '-c';
             $cmd[] = 'copy';
         }

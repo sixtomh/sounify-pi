@@ -87,4 +87,98 @@ $checkStmt->execute([':id' => $insertedId]);
 assert((int)$checkStmt->fetchColumn() === 0, "Track record was not removed from SQLite database");
 echo "[PASS] 9. Delete track API (Disk file & database row successfully removed)\n";
 
+// 10. Track metadata update API test
+$stmt = $pdo->prepare("INSERT INTO history (title, artist, album, year, genre, duration, file_path, format) VALUES ('Old Title', 'Old Artist', 'Old Album', '2020', 'Pop', 180, 'dummy.mp3', 'mp3')");
+$stmt->execute();
+$updateTrackId = (int) $pdo->lastInsertId();
+
+$_SERVER['REQUEST_URI'] = '/api/track/update';
+$_SERVER['REQUEST_METHOD'] = 'POST';
+$_SESSION['sounify_authenticated'] = true;
+$_POST = [
+    'id' => $updateTrackId,
+    'title' => 'New Title',
+    'artist' => 'New Artist',
+    'album' => 'New Album Name',
+    'year' => '2024',
+    'genre' => 'Hip-Hop/Rap'
+];
+
+ob_start();
+$app = new Sounify\App();
+$app->run();
+$updateRes = json_decode(ob_get_clean(), true);
+
+assert(isset($updateRes['success']) && $updateRes['success'] === true, "Track metadata update API failed");
+
+$checkUpdate = $pdo->prepare("SELECT * FROM history WHERE id = :id");
+$checkUpdate->execute([':id' => $updateTrackId]);
+$updatedRow = $checkUpdate->fetch();
+assert($updatedRow['album'] === 'New Album Name', "Album was not updated in database");
+assert($updatedRow['title'] === 'New Title', "Title was not updated in database");
+assert($updatedRow['year'] === '2024', "Year was not updated in database");
+
+// Cleanup test row
+$pdo->exec("DELETE FROM history WHERE id = {$updateTrackId}");
+echo "[PASS] 10. Update track metadata API (Album, title, artist, year and genre updated)\n";
+
+// 11. Bulk update & bulk delete API test
+$dummyFile1 = Sounify\Config::getDownloadDir() . '/dummy_bulk_1.mp3';
+$dummyFile2 = Sounify\Config::getDownloadDir() . '/dummy_bulk_2.mp3';
+file_put_contents($dummyFile1, 'DUMMY 1');
+file_put_contents($dummyFile2, 'DUMMY 2');
+
+$stmt = $pdo->prepare("INSERT INTO history (title, artist, album, duration, file_path, format) VALUES ('Track 1', 'Artist A', 'Old Alb 1', 100, :fp1, 'mp3')");
+$stmt->execute([':fp1' => $dummyFile1]);
+$id1 = (int) $pdo->lastInsertId();
+
+$stmt = $pdo->prepare("INSERT INTO history (title, artist, album, duration, file_path, format) VALUES ('Track 2', 'Artist B', 'Old Alb 2', 200, :fp2, 'mp3')");
+$stmt->execute([':fp2' => $dummyFile2]);
+$id2 = (int) $pdo->lastInsertId();
+
+// 11a. Test bulk-update
+$_SERVER['REQUEST_URI'] = '/api/library/bulk-update';
+$_SERVER['REQUEST_METHOD'] = 'POST';
+$_SESSION['sounify_authenticated'] = true;
+$_POST = [
+    'ids' => [$id1, $id2],
+    'album' => 'Unified Album',
+    'genre' => 'Electronic'
+];
+
+ob_start();
+$app = new Sounify\App();
+$app->run();
+$bulkUpdateRes = json_decode(ob_get_clean(), true);
+
+assert(isset($bulkUpdateRes['success']) && $bulkUpdateRes['success'] === true, "Bulk update failed");
+assert($bulkUpdateRes['updated'] === 2, "Bulk update count mismatch");
+
+$row1 = $pdo->query("SELECT * FROM history WHERE id = {$id1}")->fetch();
+$row2 = $pdo->query("SELECT * FROM history WHERE id = {$id2}")->fetch();
+assert($row1['album'] === 'Unified Album' && $row1['genre'] === 'Electronic', "Row 1 bulk update mismatch");
+assert($row2['album'] === 'Unified Album' && $row2['genre'] === 'Electronic', "Row 2 bulk update mismatch");
+
+// 11b. Test bulk-delete
+$_SERVER['REQUEST_URI'] = '/api/library/bulk-delete';
+$_SERVER['REQUEST_METHOD'] = 'POST';
+$_POST = [
+    'ids' => [$id1, $id2]
+];
+
+ob_start();
+$app = new Sounify\App();
+$app->run();
+$bulkDeleteRes = json_decode(ob_get_clean(), true);
+
+assert(isset($bulkDeleteRes['success']) && $bulkDeleteRes['success'] === true, "Bulk delete failed");
+assert($bulkDeleteRes['deleted'] === 2, "Bulk delete count mismatch");
+assert(!file_exists($dummyFile1), "Bulk dummy file 1 not deleted from disk");
+assert(!file_exists($dummyFile2), "Bulk dummy file 2 not deleted from disk");
+
+$remainingCount = (int) $pdo->query("SELECT COUNT(*) FROM history WHERE id IN ({$id1}, {$id2})")->fetchColumn();
+assert($remainingCount === 0, "Bulk deleted rows still remain in history table");
+
+echo "[PASS] 11. Bulk update & bulk delete APIs (Multi-track batch tagging & batch deletion)\n";
+
 echo "\nALL TESTS PASSED SUCCESSFULLY!\n";

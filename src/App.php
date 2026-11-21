@@ -57,6 +57,30 @@ class App
         }
     }
 
+    private function fetchRemoteUrl(string $url): ?string
+    {
+        if (function_exists('curl_init')) {
+            $ch = curl_init($url);
+            if ($ch !== false) {
+                curl_setopt_array($ch, [
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_USERAGENT => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)',
+                    CURLOPT_TIMEOUT => 10,
+                    CURLOPT_SSL_VERIFYPEER => false,
+                ]);
+                $res = curl_exec($ch);
+                $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                curl_close($ch);
+                if ($code === 200 && is_string($res) && strlen($res) > 200) {
+                    return $res;
+                }
+            }
+        }
+        $data = @file_get_contents($url);
+        return ($data && strlen($data) > 200) ? $data : null;
+    }
+
     public function run(): void
     {
         if (session_status() === PHP_SESSION_NONE && !headers_sent()) {
@@ -285,6 +309,23 @@ class App
                 $recentStmt = $pdo->query("SELECT * FROM history ORDER BY downloaded_at DESC LIMIT 6");
                 $recent = $recentStmt->fetchAll();
 
+                $downloadDir = Config::getDownloadDir();
+                $diskFree = @disk_free_space($downloadDir);
+                $diskTotal = @disk_total_space($downloadDir);
+                $storage = null;
+                if ($diskTotal !== false && $diskFree !== false && $diskTotal > 0) {
+                    $diskUsed = $diskTotal - $diskFree;
+                    $storage = [
+                        'free' => $diskFree,
+                        'total' => $diskTotal,
+                        'used' => $diskUsed,
+                        'percent' => round(($diskUsed / $diskTotal) * 100, 1),
+                        'free_formatted' => round($diskFree / (1024 * 1024 * 1024), 1) . ' GB',
+                        'total_formatted' => round($diskTotal / (1024 * 1024 * 1024), 1) . ' GB',
+                        'used_formatted' => round($diskUsed / (1024 * 1024 * 1024), 1) . ' GB'
+                    ];
+                }
+
                 echo json_encode([
                     'success' => true,
                     'stats' => [
@@ -293,7 +334,8 @@ class App
                         'navidrome_enabled' => Config::getBool('navidrome_enabled', false),
                         'navidrome_url' => Config::get('navidrome_url', 'http://127.0.0.1:4533'),
                         'audio_format' => Config::get('audio_format', 'mp3'),
-                        'recent_tracks' => $recent
+                        'recent_tracks' => $recent,
+                        'storage' => $storage
                     ]
                 ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
                 return;
@@ -395,6 +437,253 @@ class App
                     'success' => true,
                     'message' => "Track '" . ($track['title'] ?? 'Track') . "' deleted from library and disk.",
                     'file_deleted' => $fileDeleted
+                ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+                return;
+
+            case '/api/track/update':
+            case '/api/library/update':
+                if ($method !== 'POST') {
+                    $this->setResponseCode(405);
+                    echo json_encode(['error' => true, 'message' => 'Method not allowed']);
+                    return;
+                }
+                $id = (int) ($input['id'] ?? ($_POST['id'] ?? 0));
+                if ($id <= 0) {
+                    $this->setResponseCode(400);
+                    echo json_encode(['error' => true, 'message' => 'Track ID is required']);
+                    return;
+                }
+
+                $pdo = Database::get();
+                $stmt = $pdo->prepare("SELECT * FROM history WHERE id = :id LIMIT 1");
+                $stmt->execute([':id' => $id]);
+                $track = $stmt->fetch();
+                if (!$track) {
+                    $this->setResponseCode(404);
+                    echo json_encode(['error' => true, 'message' => 'Track not found in library']);
+                    return;
+                }
+
+                $title = trim((string)($input['title'] ?? '')) ?: $track['title'];
+                $artist = trim((string)($input['artist'] ?? '')) ?: $track['artist'];
+                $album = trim((string)($input['album'] ?? ''));
+                $year = trim((string)($input['year'] ?? ''));
+                $genre = trim((string)($input['genre'] ?? ''));
+
+                // Actualizar en base de datos SQLite
+                $updateStmt = $pdo->prepare("
+                    UPDATE history 
+                    SET title = :title, artist = :artist, album = :album, year = :year, genre = :genre 
+                    WHERE id = :id
+                ");
+                $updateStmt->execute([
+                    ':title' => $title,
+                    ':artist' => $artist,
+                    ':album' => $album,
+                    ':year' => $year,
+                    ':genre' => $genre,
+                    ':id' => $id,
+                ]);
+
+                // Actualizar tags ID3 directamente en el archivo de audio físico si existe
+                $filePath = (string)($track['file_path'] ?? '');
+                $fileTagged = false;
+                if ($filePath !== '' && file_exists($filePath) && is_file($filePath)) {
+                    try {
+                        $tagger = new \Sounify\Tagging\Id3Writer();
+                        $tagger->tagAudio($filePath, [
+                            'title' => $title,
+                            'artist' => $artist,
+                            'album' => $album,
+                            'year' => $year,
+                            'genre' => $genre,
+                        ]);
+                        $fileTagged = true;
+                    } catch (\Throwable $e) {}
+                }
+
+                // Notificar a Navidrome si auto scan está activo
+                if (Config::getBool('navidrome_enabled', false) && Config::getBool('navidrome_auto_scan', true)) {
+                    try {
+                        $navidrome = new NavidromeClient(
+                            Config::get('navidrome_url', 'http://127.0.0.1:4533'),
+                            Config::get('navidrome_user', ''),
+                            Config::get('navidrome_pass', '')
+                        );
+                        $navidrome->startScan();
+                    } catch (\Throwable) {}
+                }
+
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Track metadata updated successfully.',
+                    'file_tagged' => $fileTagged,
+                    'track' => [
+                        'id' => $id,
+                        'title' => $title,
+                        'artist' => $artist,
+                        'album' => $album,
+                        'year' => $year,
+                        'genre' => $genre,
+                    ]
+                ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+                return;
+
+            case '/api/library/bulk-update':
+                if ($method !== 'POST') {
+                    $this->setResponseCode(405);
+                    echo json_encode(['error' => true, 'message' => 'Method not allowed']);
+                    return;
+                }
+                $ids = $input['ids'] ?? [];
+                if (!is_array($ids) || empty($ids)) {
+                    $this->setResponseCode(400);
+                    echo json_encode(['error' => true, 'message' => 'Track IDs are required']);
+                    return;
+                }
+
+                $fieldsToUpdate = [];
+                $params = [];
+                if (isset($input['album']) && trim((string)$input['album']) !== '') {
+                    $fieldsToUpdate[] = "album = ?";
+                    $params[] = trim((string)$input['album']);
+                }
+                if (isset($input['artist']) && trim((string)$input['artist']) !== '') {
+                    $fieldsToUpdate[] = "artist = ?";
+                    $params[] = trim((string)$input['artist']);
+                }
+                if (isset($input['year']) && trim((string)$input['year']) !== '') {
+                    $fieldsToUpdate[] = "year = ?";
+                    $params[] = trim((string)$input['year']);
+                }
+                if (isset($input['genre']) && trim((string)$input['genre']) !== '') {
+                    $fieldsToUpdate[] = "genre = ?";
+                    $params[] = trim((string)$input['genre']);
+                }
+
+                if (empty($fieldsToUpdate)) {
+                    $this->setResponseCode(400);
+                    echo json_encode(['error' => true, 'message' => 'No fields to update']);
+                    return;
+                }
+
+                $pdo = Database::get();
+                $sanitizedIds = array_values(array_unique(array_filter(array_map('intval', $ids))));
+                if (empty($sanitizedIds)) {
+                    $this->setResponseCode(400);
+                    echo json_encode(['error' => true, 'message' => 'Invalid track IDs']);
+                    return;
+                }
+
+                $placeholders = implode(',', array_fill(0, count($sanitizedIds), '?'));
+                $updateSql = "UPDATE history SET " . implode(', ', $fieldsToUpdate) . " WHERE id IN ({$placeholders})";
+                $stmt = $pdo->prepare($updateSql);
+                $allValues = array_merge($params, $sanitizedIds);
+                $stmt->execute($allValues);
+
+                // Actualizar tags ID3 físicos de cada archivo
+                $tagger = new \Sounify\Tagging\Id3Writer();
+                $fetchStmt = $pdo->prepare("SELECT * FROM history WHERE id IN ({$placeholders})");
+                $fetchStmt->execute($sanitizedIds);
+                $updatedTracks = $fetchStmt->fetchAll();
+                $taggedCount = 0;
+                foreach ($updatedTracks as $t) {
+                    $fp = (string)($t['file_path'] ?? '');
+                    if ($fp !== '' && file_exists($fp) && is_file($fp)) {
+                        try {
+                            $tagger->tagAudio($fp, [
+                                'title' => $t['title'],
+                                'artist' => $t['artist'],
+                                'album' => $t['album'],
+                                'year' => $t['year'],
+                                'genre' => $t['genre'],
+                            ]);
+                            $taggedCount++;
+                        } catch (\Throwable) {}
+                    }
+                }
+
+                if (Config::getBool('navidrome_enabled', false) && Config::getBool('navidrome_auto_scan', true)) {
+                    try {
+                        $navidrome = new NavidromeClient(
+                            Config::get('navidrome_url', 'http://127.0.0.1:4533'),
+                            Config::get('navidrome_user', ''),
+                            Config::get('navidrome_pass', '')
+                        );
+                        $navidrome->startScan();
+                    } catch (\Throwable) {}
+                }
+
+                echo json_encode([
+                    'success' => true,
+                    'message' => count($sanitizedIds) . ' tracks updated successfully.',
+                    'count' => count($sanitizedIds),
+                    'updated' => count($sanitizedIds),
+                    'tagged_files' => $taggedCount
+                ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+                return;
+
+            case '/api/library/bulk-delete':
+                if ($method !== 'POST') {
+                    $this->setResponseCode(405);
+                    echo json_encode(['error' => true, 'message' => 'Method not allowed']);
+                    return;
+                }
+                $ids = $input['ids'] ?? [];
+                if (!is_array($ids) || empty($ids)) {
+                    $this->setResponseCode(400);
+                    echo json_encode(['error' => true, 'message' => 'Track IDs are required']);
+                    return;
+                }
+
+                $pdo = Database::get();
+                $sanitizedIds = array_values(array_unique(array_filter(array_map('intval', $ids))));
+                if (empty($sanitizedIds)) {
+                    $this->setResponseCode(400);
+                    echo json_encode(['error' => true, 'message' => 'Invalid track IDs']);
+                    return;
+                }
+
+                $placeholders = implode(',', array_fill(0, count($sanitizedIds), '?'));
+                $fetchStmt = $pdo->prepare("SELECT id, file_path FROM history WHERE id IN ({$placeholders})");
+                $fetchStmt->execute($sanitizedIds);
+                $tracks = $fetchStmt->fetchAll();
+
+                $deletedFiles = 0;
+                $cacheDir = dirname(__DIR__) . '/storage/covers';
+                foreach ($tracks as $t) {
+                    $fp = (string)($t['file_path'] ?? '');
+                    if ($fp !== '' && file_exists($fp) && is_file($fp)) {
+                        if (@unlink($fp)) {
+                            $deletedFiles++;
+                        }
+                    }
+                    $cPath = "{$cacheDir}/{$t['id']}.jpg";
+                    if (file_exists($cPath)) {
+                        @unlink($cPath);
+                    }
+                }
+
+                $delStmt = $pdo->prepare("DELETE FROM history WHERE id IN ({$placeholders})");
+                $delStmt->execute($sanitizedIds);
+
+                if (Config::getBool('navidrome_enabled', false) && Config::getBool('navidrome_auto_scan', true)) {
+                    try {
+                        $navidrome = new NavidromeClient(
+                            Config::get('navidrome_url', 'http://127.0.0.1:4533'),
+                            Config::get('navidrome_user', ''),
+                            Config::get('navidrome_pass', '')
+                        );
+                        $navidrome->startScan();
+                    } catch (\Throwable) {}
+                }
+
+                echo json_encode([
+                    'success' => true,
+                    'message' => count($sanitizedIds) . ' tracks deleted from library and disk.',
+                    'deleted_count' => count($sanitizedIds),
+                    'deleted' => count($sanitizedIds),
+                    'files_deleted' => $deletedFiles
                 ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
                 return;
 
@@ -534,7 +823,7 @@ class App
                                     $coverUrl = (string)$stmtC->fetchColumn();
                                 }
                                 if ($coverUrl) {
-                                    $cData = @file_get_contents($coverUrl);
+                                    $cData = $this->fetchRemoteUrl($coverUrl);
                                     if ($cData && strlen($cData) > 500) {
                                         @file_put_contents($cachedFile, $cData);
                                         if (file_exists($cachedFile) && filesize($cachedFile) > 400) {
@@ -586,7 +875,7 @@ class App
                                     $coverUrl = (string)$stmtC->fetchColumn();
                                 }
                                 if ($coverUrl) {
-                                    $cData = @file_get_contents($coverUrl);
+                                    $cData = $this->fetchRemoteUrl($coverUrl);
                                     if ($cData && strlen($cData) > 500) {
                                         @file_put_contents($cachedFile, $cData);
                                         if (file_exists($cachedFile) && filesize($cachedFile) > 400) {
@@ -797,6 +1086,16 @@ class App
                         $pdo->rollBack();
                     }
                     throw $e;
+                }
+
+                // Limpiar también carátulas en storage/covers
+                $coversDir = dirname(__DIR__) . '/storage/covers';
+                if (is_dir($coversDir)) {
+                    foreach (glob($coversDir . '/*.{jpg,jpeg,png,webp}', GLOB_BRACE) ?: [] as $cFile) {
+                        if (basename($cFile) !== '.gitkeep') {
+                            @unlink($cFile);
+                        }
+                    }
                 }
 
                 try {
