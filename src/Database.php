@@ -74,6 +74,7 @@ class Database
                 title TEXT NOT NULL,
                 artist TEXT NOT NULL,
                 album TEXT,
+                album_artist TEXT,
                 year TEXT,
                 genre TEXT,
                 duration INTEGER DEFAULT 0,
@@ -83,6 +84,7 @@ class Database
             );
         ");
 
+        try { $pdo->exec("ALTER TABLE history ADD COLUMN album_artist TEXT"); } catch (\Throwable) {}
         try { $pdo->exec("ALTER TABLE history ADD COLUMN year TEXT"); } catch (\Throwable) {}
         try { $pdo->exec("ALTER TABLE history ADD COLUMN genre TEXT"); } catch (\Throwable) {}
         try { $pdo->exec("ALTER TABLE history ADD COLUMN cover_url TEXT"); } catch (\Throwable) {}

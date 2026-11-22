@@ -181,4 +181,36 @@ assert($remainingCount === 0, "Bulk deleted rows still remain in history table")
 
 echo "[PASS] 11. Bulk update & bulk delete APIs (Multi-track batch tagging & batch deletion)\n";
 
+// 12. Title track preservation & album_artist handling
+$testSong = ['title' => 'OTRO DIA', 'album' => 'OTRO DIA', 'artist' => 'Mora feat. Jhay Cortez'];
+$enrichedTest = $enricher->enrich($testSong);
+assert($enrichedTest['album'] === 'OTRO DIA', "Title track album was corrupted during enrichment");
+
+$stmt = $pdo->prepare("INSERT INTO history (title, artist, album, album_artist, duration, file_path, format) VALUES ('OTRO DIA', 'Mora feat. Jhay Cortez', 'OTRO DIA', 'Mora', 210, 'dummy_aa.mp3', 'mp3')");
+$stmt->execute();
+$aaId = (int)$pdo->lastInsertId();
+
+$_SERVER['REQUEST_URI'] = '/api/track/update';
+$_SERVER['REQUEST_METHOD'] = 'POST';
+$_SESSION['sounify_authenticated'] = true;
+$_POST = [
+    'id' => $aaId,
+    'title' => 'OTRO DIA',
+    'artist' => 'Mora feat. Jhay Cortez',
+    'album' => 'OTRO DIA',
+    'album_artist' => 'Mora'
+];
+
+ob_start();
+$app = new Sounify\App();
+$app->run();
+$aaRes = json_decode(ob_get_clean(), true);
+assert(isset($aaRes['success']) && $aaRes['success'] === true, "Album artist update API failed");
+
+$checkAa = $pdo->query("SELECT album_artist FROM history WHERE id = {$aaId}")->fetch();
+assert($checkAa['album_artist'] === 'Mora', "Album artist was not updated in database");
+$pdo->exec("DELETE FROM history WHERE id = {$aaId}");
+
+echo "[PASS] 12. Title track preservation & Album Artist support (Single Navidrome entity)\n";
+
 echo "\nALL TESTS PASSED SUCCESSFULLY!\n";

@@ -469,17 +469,23 @@ class App
                 $album = trim((string)($input['album'] ?? ''));
                 $year = trim((string)($input['year'] ?? ''));
                 $genre = trim((string)($input['genre'] ?? ''));
+                $albumArtist = trim((string)($input['album_artist'] ?? ''));
+                if ($albumArtist === '') {
+                    $primary = trim(preg_split('/[;,]| feat\.? | ft\.? /i', $artist)[0] ?? $artist);
+                    $albumArtist = $primary ?: $artist;
+                }
 
                 // Actualizar en base de datos SQLite
                 $updateStmt = $pdo->prepare("
                     UPDATE history 
-                    SET title = :title, artist = :artist, album = :album, year = :year, genre = :genre 
+                    SET title = :title, artist = :artist, album = :album, album_artist = :album_artist, year = :year, genre = :genre 
                     WHERE id = :id
                 ");
                 $updateStmt->execute([
                     ':title' => $title,
                     ':artist' => $artist,
                     ':album' => $album,
+                    ':album_artist' => $albumArtist,
                     ':year' => $year,
                     ':genre' => $genre,
                     ':id' => $id,
@@ -535,14 +541,17 @@ class App
                     }
 
                     try {
+                        $cachedCover = dirname(__DIR__) . "/storage/covers/{$id}.jpg";
+                        $coverPath = file_exists($cachedCover) ? $cachedCover : null;
                         $tagger = new \Sounify\Tagging\Id3Writer();
                         $tagger->tagAudio($filePath, [
                             'title' => $title,
                             'artist' => $artist,
                             'album' => $album,
+                            'album_artist' => $albumArtist,
                             'year' => $year,
                             'genre' => $genre,
-                        ]);
+                        ], $coverPath);
                         $fileTagged = true;
                     } catch (\Throwable $e) {}
                 }
@@ -568,6 +577,7 @@ class App
                         'title' => $title,
                         'artist' => $artist,
                         'album' => $album,
+                        'album_artist' => $albumArtist,
                         'year' => $year,
                         'genre' => $genre,
                     ]
@@ -592,6 +602,10 @@ class App
                 if (isset($input['album']) && trim((string)$input['album']) !== '') {
                     $fieldsToUpdate[] = "album = ?";
                     $params[] = trim((string)$input['album']);
+                }
+                if (isset($input['album_artist']) && trim((string)$input['album_artist']) !== '') {
+                    $fieldsToUpdate[] = "album_artist = ?";
+                    $params[] = trim((string)$input['album_artist']);
                 }
                 if (isset($input['artist']) && trim((string)$input['artist']) !== '') {
                     $fieldsToUpdate[] = "artist = ?";
@@ -966,6 +980,8 @@ class App
                     'mp3' => 'audio/mpeg',
                     'flac' => 'audio/flac',
                     'm4a' => 'audio/mp4',
+                    'wav' => 'audio/wav',
+                    'aac' => 'audio/aac',
                     'opus', 'ogg' => 'audio/ogg',
                     default => 'audio/mpeg',
                 };

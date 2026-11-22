@@ -267,16 +267,20 @@ class AudioDownloader
 
     private function saveHistory(array $song, string $filePath, string $format, ?string $tempCoverPath = null): void
     {
+        $primaryArtist = !empty($song['artists'][0]) ? $song['artists'][0] : trim(explode(';', (string)($song['artist'] ?? ''))[0]);
+        $albumArtist = !empty($song['album_artist']) ? $song['album_artist'] : ($primaryArtist ?: ($song['artist'] ?? 'Unknown Artist'));
+
         $pdo = Database::get();
         $stmt = $pdo->prepare("
-            INSERT INTO history (spotify_id, title, artist, album, year, genre, duration, file_path, format, cover_url)
-            VALUES (:sid, :t, :a, :alb, :yr, :gnr, :d, :fp, :fmt, :c)
+            INSERT INTO history (spotify_id, title, artist, album, album_artist, year, genre, duration, file_path, format, cover_url)
+            VALUES (:sid, :t, :a, :alb, :aa, :yr, :gnr, :d, :fp, :fmt, :c)
         ");
         $stmt->execute([
             ':sid' => $song['id'] ?? null,
             ':t' => $song['title'] ?? $song['name'] ?? 'Unknown',
             ':a' => $song['artist'] ?? 'Unknown Artist',
             ':alb' => $song['album'] ?? $song['album_name'] ?? '',
+            ':aa' => $albumArtist,
             ':yr' => $song['year'] ?? '',
             ':gnr' => $song['genre'] ?? '',
             ':d' => (int) ($song['duration'] ?? 0),

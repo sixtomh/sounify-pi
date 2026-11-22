@@ -53,7 +53,7 @@ class Config
         while ($row = $stmt->fetch()) {
             $all[$row['key']] = $row['value'];
         }
-        $all['download_dir'] = self::getDownloadDir();
+        $all['download_dir'] = self::get('download_dir') ?: self::getDownloadDir();
         return $all;
     }
 

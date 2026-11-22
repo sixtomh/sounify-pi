@@ -204,7 +204,7 @@
                 <svg class="sidebar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
                 <span>Changelog</span>
               </div>
-              <span style="font-size: 0.65rem; background: var(--accent); color: #000; padding: 1px 6px; border-radius: 99px; font-weight: 800;">v1.3.1</span>
+              <span style="font-size: 0.65rem; background: var(--accent); color: #000; padding: 1px 6px; border-radius: 99px; font-weight: 800;">v1.3.2</span>
             </a>
           </li>
         </ul>
@@ -245,7 +245,7 @@
               </a>
             </div>
             <div class="badge-row">
-              <span class="meta-badge highlight">v1.3.1 Latest</span>
+              <span class="meta-badge highlight">v1.3.2 Latest</span>
               <span class="meta-badge">Orange Pi &amp; ARM64</span>
               <span class="meta-badge">Zero API Keys</span>
               <span class="meta-badge">Navidrome Subsonic Auto-Sync</span>
@@ -1132,12 +1132,44 @@ sudo chmod -R 775 storage/downloads/</code></pre>
 
           <div class="changelog-timeline">
             
+            <!-- v1.3.2 -->
+            <div class="changelog-release">
+              <div class="changelog-dot"></div>
+              <div class="changelog-header">
+                <span class="changelog-version">v1.3.2</span>
+                <span class="changelog-tag tag-latest">Latest</span>
+                <span class="changelog-date">November 2026</span>
+              </div>
+              <div class="changelog-card">
+                <h4><span class="badge-pill pill-fix">FIX</span> Title Track Album Preservation &amp; Navidrome Split Album Prevention</h4>
+                <ul>
+                  <li>Fixed critical metadata enrichment bug where title tracks (songs sharing the same title as the album, e.g. <em>"OTRO DIA"</em> on album <em>"OTRO DIA"</em>) were mistakenly marked as missing an album, causing iTunes query overrides and song-title album replacements.</li>
+                  <li>Added native <strong>Album Artist</strong> (<code>album_artist</code>, <code>TPE2</code>) field support across SQLite database, metadata editing dialog, bulk edit modal, and ID3 writer to permanently prevent Navidrome from splitting albums.</li>
+                  <li>Enhanced ID3 tagger to pass and preserve embedded cover artwork during metadata edits.</li>
+                </ul>
+
+                <h4><span class="badge-pill pill-fix">FIX</span> Playback Queue Continuity &amp; Album Auto-Advance</h4>
+                <ul>
+                  <li>Fixed playback queue logic: playing an album card in the Library now maintains the entire album tracklist in queue so <em>Next Track</em> and auto-advance play the next album song in sequence instead of jumping to a random song in the library.</li>
+                  <li>Added global keyboard hotkeys <kbd>N</kbd> (Next Track) and <kbd>P</kbd> (Previous Track) for power users.</li>
+                  <li>Updated <code>formatDuration</code> to support durations over 1 hour (<code>H:MM:SS</code> format) for DJ sets and full album streams.</li>
+                </ul>
+
+                <h4><span class="badge-pill pill-fix">FIX</span> Large Storage Drive Telemetry &amp; Timezone Precision</h4>
+                <ul>
+                  <li>Upgraded <code>formatBytes</code> to support terabyte (<code>TB</code>) and petabyte (<code>PB</code>) storage drives on Orange Pi and NAS setups without returning <code>undefined</code>.</li>
+                  <li>Fixed <code>timeAgo</code> function to parse SQLite UTC timestamps reliably across all client timezones without producing negative deltas.</li>
+                  <li>Added Spotify URI scheme resolver support (e.g. <code>spotify:track:...</code>, <code>spotify:album:...</code>).</li>
+                </ul>
+              </div>
+            </div>
+
             <!-- v1.3.1 -->
             <div class="changelog-release">
               <div class="changelog-dot"></div>
               <div class="changelog-header">
                 <span class="changelog-version">v1.3.1</span>
-                <span class="changelog-tag tag-latest">Latest</span>
+                <span class="changelog-tag">Release</span>
                 <span class="changelog-date">November 2026</span>
               </div>
               <div class="changelog-card">

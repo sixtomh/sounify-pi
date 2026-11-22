@@ -37,6 +37,10 @@ class Id3Writer
             $cmd[] = '0';
             $cmd[] = '-c';
             $cmd[] = 'copy';
+            if ($supportsAttachedPic) {
+                $cmd[] = '-disposition:v:0';
+                $cmd[] = 'attached_pic';
+            }
         }
 
         // Metadatos estándar (Separador ';' para multi-artistas en Navidrome)
@@ -50,7 +54,7 @@ class Id3Writer
         }
 
         $artist = !empty($artistsList) ? implode('; ', $artistsList) : ($song['artist'] ?? '');
-        $albumArtist = !empty($artistsList[0]) ? $artistsList[0] : $artist;
+        $albumArtist = !empty($song['album_artist']) ? trim((string)$song['album_artist']) : (!empty($artistsList[0]) ? $artistsList[0] : $artist);
 
         $album = trim($song['album'] ?? $song['album_name'] ?? '');
         if ($album === '' || strtolower($album) === 'single') {

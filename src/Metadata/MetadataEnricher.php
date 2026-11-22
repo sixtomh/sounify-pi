@@ -16,8 +16,8 @@ class MetadataEnricher
         $currentAlbum = trim($song['album'] ?? $song['album_name'] ?? '');
         $order = $song['order'] ?? $song['track_number'] ?? null;
 
-        // Si el álbum está vacío, es 'single' o es idéntico al título, necesita enriquecimiento de álbum
-        $needsAlbum = ($currentAlbum === '' || strtolower($currentAlbum) === 'single' || strcasecmp($currentAlbum, $title) === 0);
+        // Si el álbum está vacío o es 'single', necesita enriquecimiento de álbum
+        $needsAlbum = ($currentAlbum === '' || strtolower($currentAlbum) === 'single');
         $needsYear = empty($year);
         $needsGenre = empty($genre);
         $needsOrder = empty($order);

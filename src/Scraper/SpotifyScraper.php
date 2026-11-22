@@ -36,6 +36,10 @@ class SpotifyScraper
             }
         }
 
+        if (preg_match('#^spotify:(track|album|playlist|artist):([A-Za-z0-9]+)#i', trim($url), $m)) {
+            return ['type' => strtolower($m[1]), 'id' => $m[2]];
+        }
+
         if (preg_match('#(?:open\.)?spotify\.com/(?:intl-[a-zA-Z0-9_-]+/)?(track|album|playlist|artist)/([A-Za-z0-9]+)#i', $url, $m)) {
             return ['type' => strtolower($m[1]), 'id' => $m[2]];
         }

@@ -548,6 +548,7 @@ document.addEventListener('DOMContentLoaded', () => {
   audioPlayer.volume = 0.8;
   let currentPlayingTrack = null;
   let currentPlayingIndex = -1;
+  let currentPlaybackQueue = null;
   let isShuffled = false;
   let isRepeated = false;
 
@@ -619,9 +620,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function timeAgo(dateString) {
     if (!dateString) return 'Recently';
-    const date = new Date(dateString.replace(' ', 'T'));
+    const s = dateString.includes('Z') || dateString.includes('+') ? dateString : dateString.replace(' ', 'T') + 'Z';
+    const date = new Date(s);
     if (isNaN(date.getTime())) return dateString;
-    const seconds = Math.floor((new Date() - date) / 1000);
+    const diff = (new Date() - date) / 1000;
+    const seconds = Math.max(0, Math.floor(diff));
     if (seconds < 60) return 'Just now';
     const minutes = Math.floor(seconds / 60);
     if (minutes < 60) return `${minutes} minute${minutes === 1 ? '' : 's'} ago`;
@@ -636,8 +639,8 @@ document.addEventListener('DOMContentLoaded', () => {
   function formatBytes(bytes) {
     if (!bytes || bytes <= 0) return '0 MB';
     const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB'];
+    const i = Math.min(Math.floor(Math.log(bytes) / Math.log(k)), sizes.length - 1);
     return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
   }
 
@@ -645,9 +648,16 @@ document.addEventListener('DOMContentLoaded', () => {
   function playTrack(track, queue = null) {
     if (!track) return;
     currentPlayingTrack = track;
-    const activeList = queue && queue.length ? queue : getFilteredAndSortedTracks();
-    currentPlayingIndex = activeList.findIndex(t => t.id === track.id);
-    if (currentPlayingIndex === -1) currentPlayingIndex = 0;
+    if (queue && queue.length) {
+      currentPlaybackQueue = queue.slice();
+    } else if (!currentPlaybackQueue || !currentPlaybackQueue.length) {
+      currentPlaybackQueue = getFilteredAndSortedTracks();
+    }
+    currentPlayingIndex = currentPlaybackQueue.findIndex(t => t.id === track.id);
+    if (currentPlayingIndex === -1) {
+      currentPlaybackQueue.unshift(track);
+      currentPlayingIndex = 0;
+    }
 
     if (spPlayerTitle) spPlayerTitle.textContent = track.title || 'Unknown Title';
     if (spPlayerArtist) spPlayerArtist.textContent = `${track.artist || 'Unknown Artist'}${track.album ? ' · ' + track.album : ''}`;
@@ -668,8 +678,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function togglePlayPause() {
     if (!currentPlayingTrack) {
-      const list = getFilteredAndSortedTracks();
-      if (list.length) playTrack(list[0]);
+      const list = (currentPlaybackQueue && currentPlaybackQueue.length) ? currentPlaybackQueue : getFilteredAndSortedTracks();
+      if (list.length) playTrack(list[0], list);
       return;
     }
     if (audioPlayer.paused) {
@@ -681,7 +691,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function playNextTrack() {
-    const list = getFilteredAndSortedTracks();
+    const list = (currentPlaybackQueue && currentPlaybackQueue.length) ? currentPlaybackQueue : getFilteredAndSortedTracks();
     if (!list.length) return;
     let nextIdx;
     if (isShuffled) {
@@ -693,7 +703,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function playPrevTrack() {
-    const list = getFilteredAndSortedTracks();
+    const list = (currentPlaybackQueue && currentPlaybackQueue.length) ? currentPlaybackQueue : getFilteredAndSortedTracks();
     if (!list.length) return;
     if (audioPlayer.currentTime > 3) {
       audioPlayer.currentTime = 0;
@@ -1252,6 +1262,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const editTrackTitle = document.getElementById('edit-track-title');
   const editTrackArtist = document.getElementById('edit-track-artist');
   const editTrackAlbum = document.getElementById('edit-track-album');
+  const editTrackAlbumArtist = document.getElementById('edit-track-album-artist');
   const editTrackYear = document.getElementById('edit-track-year');
   const editTrackGenre = document.getElementById('edit-track-genre');
   const editCoverPreview = document.getElementById('edit-cover-preview');
@@ -1305,6 +1316,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (editTrackTitle) editTrackTitle.value = track.title || '';
     if (editTrackArtist) editTrackArtist.value = track.artist || '';
     if (editTrackAlbum) editTrackAlbum.value = track.album || '';
+    if (editTrackAlbumArtist) editTrackAlbumArtist.value = track.album_artist || '';
     if (editTrackYear) editTrackYear.value = track.year || '';
     if (editTrackGenre) editTrackGenre.value = track.genre || '';
     if (editCoverPreview) editCoverPreview.src = `/api/cover?id=${track.id}`;
@@ -1463,6 +1475,20 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
+    // 8. Next track: "N" or "n"
+    if ((e.key === 'n' || e.key === 'N') && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      e.preventDefault();
+      playNextTrack();
+      return;
+    }
+
+    // 9. Previous track: "P" or "p"
+    if ((e.key === 'p' || e.key === 'P') && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      e.preventDefault();
+      playPrevTrack();
+      return;
+    }
+
     // 8. Number keys 1-5 to switch tabs: 1=home, 2=search, 3=downloads, 4=library, 5=settings
     if (['1', '2', '3', '4', '5'].includes(e.key) && !e.ctrlKey && !e.metaKey && !e.altKey) {
       e.preventDefault();
@@ -1533,10 +1559,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const album = (document.getElementById('bulk-edit-album')?.value || '').trim();
     const artist = (document.getElementById('bulk-edit-artist')?.value || '').trim();
+    const albumArtist = (document.getElementById('bulk-edit-album-artist')?.value || '').trim();
     const year = (document.getElementById('bulk-edit-year')?.value || '').trim();
     const genre = (document.getElementById('bulk-edit-genre')?.value || '').trim();
 
-    if (!album && !artist && !year && !genre) {
+    if (!album && !artist && !albumArtist && !year && !genre) {
       if (bulkModalFeedback) {
         bulkModalFeedback.textContent = 'Please fill at least one field to update.';
         bulkModalFeedback.style.color = 'var(--error)';
@@ -1554,6 +1581,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const payload = { ids: Array.from(selectedTrackIds) };
     if (album) payload.album = album;
     if (artist) payload.artist = artist;
+    if (albumArtist) payload.album_artist = albumArtist;
     if (year) payload.year = year;
     if (genre) payload.genre = genre;
 
@@ -1688,6 +1716,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const title = (editTrackTitle?.value || '').trim();
     const artist = (editTrackArtist?.value || '').trim();
     const album = (editTrackAlbum?.value || '').trim();
+    const albumArtist = (editTrackAlbumArtist?.value || '').trim();
     const year = (editTrackYear?.value || '').trim();
     const genre = (editTrackGenre?.value || '').trim();
 
@@ -1706,7 +1735,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const res = await fetch('/api/track/update', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, title, artist, album, year, genre })
+        body: JSON.stringify({ id, title, artist, album, album_artist: albumArtist, year, genre })
       });
       const data = await res.json();
       if (res.ok && data.success) {
@@ -1715,6 +1744,7 @@ document.addEventListener('DOMContentLoaded', () => {
           tr.title = title;
           tr.artist = artist;
           tr.album = album;
+          tr.album_artist = albumArtist;
           tr.year = year;
           tr.genre = genre;
         }
@@ -2239,8 +2269,12 @@ document.addEventListener('DOMContentLoaded', () => {
   function formatDuration(sec) {
     if (!sec || isNaN(sec)) return '0:00';
     const total = Math.floor(Number(sec));
-    const m = Math.floor(total / 60);
+    const h = Math.floor(total / 3600);
+    const m = Math.floor((total % 3600) / 60);
     const s = Math.floor(total % 60);
+    if (h > 0) {
+      return `${h}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    }
     return `${m}:${s.toString().padStart(2, '0')}`;
   }
 
